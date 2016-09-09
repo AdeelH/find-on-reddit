@@ -23,10 +23,12 @@ function render() {
 	if (url) {
 		getSubmissions(url, displayPosts);
 	}
-	getCurrentTabUrl(function(url) {
-		$('#url').val(url);
-		getSubmissions(url, displayPosts);
-	});
+	else {
+		getCurrentTabUrl(function(url) {
+			$('#url').val(url);
+			getSubmissions(url, displayPosts);
+		});
+	}
 }
 
 function getSubmissions(url, onSuccess) {
