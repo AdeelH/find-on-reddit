@@ -27,16 +27,25 @@ function init() {
 }
 
 function render() {
+	var ignoreQueryString = $('#ignore-qs').prop('checked');
 	var url = $('#url').val();
+
 	if (url) {
+		url = ignoreQueryString ? getPathFromUrl(url) : url;
+		console.log('url', url);
 		getSubmissions(url, displayPosts);
 	}
 	else {
 		getCurrentTabUrl(function(url) {
 			$('#url').val(url);
+			url = ignoreQueryString ? getPathFromUrl(url) : url;
 			getSubmissions(url, displayPosts);
 		});
 	}
+}
+
+function getPathFromUrl(url) {
+	return url.split(/[?#]/)[0];
 }
 
 function getSubmissions(url, onSuccess) {
