@@ -1,20 +1,28 @@
 $(document).ready(init);
 
 function init() {
+	// open links in new tab
 	$('body').on('click', 'a', function(){
-		// open links in new tab
 		chrome.tabs.create({
 			url: $(this).attr('href')
 		});
 		return false;
 	});
+	// receive updated html from template.html
 	window.addEventListener('message', function(event) {
 		if (event.data.html) {
-			console.log('hi', event.data.html);
 			$('#results').html(event.data.html);
 		}
 	});
+	// search when 'Go' button pressed
 	$('#url-submit').click(render);
+	// search when enter key pressed
+	$('#url').keyup(function(e) {
+		if (e.keyCode == 13) {
+			render();
+			e.stopPropagation();
+		}
+	});
 	render();
 }
 
