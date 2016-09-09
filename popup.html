@@ -1,0 +1,34 @@
+<!doctype html>
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="popup.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body class="night-mode">
+    <div id="main" class="container-fluid">
+      <div id="url-container" class="row">
+        <form class="form-inline">
+          <div class="form-group">
+            <div class="input-group">
+              <input type="text" id="url" class="form-control" placeholder="url to find...">
+              <div class="input-group-btn">
+                <button id="url-submit" type="button" class="btn btn-default">Go</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="results" class="row"></div>
+    </div>
+    <iframe id="tFrame" class="hidden" src="template.html"></iframe>
+  </body>
+</html>

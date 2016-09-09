@@ -1,0 +1,53 @@
+body 
+{
+  background-color: #ccc;
+  font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+  width: 750px;
+}
+#main 
+{
+  max-width: 95%;
+  padding: 20px;
+}
+.status-container
+{
+  padding-left: 18px;
+}
+.list-container
+{
+  padding: 10px;
+}
+td 
+{
+  padding: 10px;
+  vertical-align: middle;
+}/*
+td.score,
+td.subreddit
+{
+	text-align: center;
+}*/
+a
+{
+  color: #444;
+}
+.night-mode
+{
+	background-color: #333;
+	color: white;
+}
+.night-mode a
+{
+  color: #aaa;
+}
+.night-mode input.form-control
+{
+	background-color: #777;
+	color: white;
+	font-size: 15px;
+}
+.night-mode .btn-default
+{
+	background-color: #999;
+	color: white;
+}

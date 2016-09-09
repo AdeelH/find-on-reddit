@@ -1,0 +1,26 @@
+<script src="js/handlebars-v4.0.5.js"></script>
+<script id="search-results-template" type="text/x-handlebars-template">
+  <div class="row status-container">
+    <span id="status">{{numPosts}} results</span>
+  </div>
+  <div class="row container-fluid list-container">
+    <table id="list" class="table">
+      {{#each posts}}
+        <tr class="row">
+          <td class="col-md-1 score">{{data.score}}</td>
+          <td class="col-md-3 thumbnail"><img src="{{data.thumbnail}}" width="60px" height="60px"></td>
+          <td class="col-md-6 title"><a href="https://www.reddit.com{{data.permalink}}">{{data.title}} ({{data.num_comments}} comments)</a></td>
+          <td class="col-md-2 subreddit"><a href="https://www.reddit.com/r/{{data.subreddit}}">{{data.subreddit}}</a></td>
+        </tr>
+      {{/each}}
+    </table>
+  </div>
+</script>
+<script>
+  var template = Handlebars.compile(document.getElementById("search-results-template").innerHTML);
+  window.addEventListener('message', function(event) {
+    event.source.postMessage({
+      html: template(event.data.context)
+    }, event.origin);
+  });
+</script>
