@@ -16,5 +16,8 @@
     "activeTab",
     "https://ajax.googleapis.com/",
     "<all_urls>"
-  ]
+  ],
+  "icons": {
+    "256": "icon.png"
+  }
 }
