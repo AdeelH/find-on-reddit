@@ -32,14 +32,13 @@ function render() {
 
 	if (url) {
 		url = ignoreQueryString ? getPathFromUrl(url) : url;
-		console.log('url', url);
-		getSubmissions(url, displayPosts);
+		search(url, displayPosts);
 	}
 	else {
 		getCurrentTabUrl(function(url) {
 			$('#url').val(url);
 			url = ignoreQueryString ? getPathFromUrl(url) : url;
-			getSubmissions(url, displayPosts);
+			search(url, displayPosts);
 		});
 	}
 }
@@ -48,7 +47,7 @@ function getPathFromUrl(url) {
 	return url.split(/[?#]/)[0];
 }
 
-function getSubmissions(url, onSuccess) {
+function search(url, onSuccess) {
 	$.ajax({
 		url: 'https://api.reddit.com/search?sort=top&t=all&&type=link&q=url:' + encodeURIComponent(url), 
 		success: onSuccess, 
@@ -59,6 +58,7 @@ function getSubmissions(url, onSuccess) {
 function displayPosts(postList) {
 	var posts = postList.data.children;
 	var message = {
+		// context for Handlebars template
 		context: {
 			numPosts: posts.length,
 			posts: posts
@@ -75,8 +75,7 @@ function getCurrentTabUrl(callback) {
 	};
 
 	chrome.tabs.query(queryInfo, function(tabs) {
-		var tab = tabs[0];
-		var url = tab.url;
+		var url = tabs[0].url;
 		console.assert(typeof url == 'string', 'tab.url should be a string');
 		
 		callback(url);
