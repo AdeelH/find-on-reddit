@@ -4,7 +4,8 @@ function init() {
 	// open links in new tab
 	$('body').on('click', 'a', function(){
 		chrome.tabs.create({
-			url: $(this).attr('href')
+			url: $(this).attr('href'),
+			active: false
 		});
 		return false;
 	});
