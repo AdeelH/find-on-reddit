@@ -7,10 +7,20 @@
     <table id="list" class="table">
       {{#each posts}}
         <tr class="row">
-          <td class="col-md-1 score">{{data.score}}</td>
-          <td class="col-md-3 post-thumbnail"><img src="{{data.thumbnail}}" width="60px" height="60px"></td>
-          <td class="col-md-6 title"><a href="https://www.reddit.com{{data.permalink}}">{{data.title}} ({{data.num_comments}} comments)</a></td>
-          <td class="col-md-2 subreddit"><a href="https://www.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a></td>
+          <td class="col-md-1 score">
+            {{data.score}}
+          </td>
+          <td class="col-md-3 post-thumbnail">
+            <img src="{{data.thumbnail}}" width="60px" height="60px">
+          </td>
+          <td class="col-md-6 title">
+            <a href="https://www.reddit.com{{data.permalink}}">
+              {{data.title}} ({{data.num_comments}} comments)
+            </a>
+          </td>
+          <td class="col-md-2 subreddit">
+            <a href="https://www.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a>
+          </td>
         </tr>
       {{/each}}
     </table>
