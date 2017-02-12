@@ -1,5 +1,5 @@
 # find-on-reddit
-Chrome extension that searches for submission of the current URL on Reddit
+Chrome extension that searches for submissions of the current URL on Reddit
 
 ## Features
   - searches for the URL of the current tab
