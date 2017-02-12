@@ -33,7 +33,7 @@ function init() {
 
 function render() {
 	var ignoreQueryString = $('#ignore-qs').prop('checked');
-	var url = $('#url').val();
+	let url = $('#url').val();
 
 	if (url) {
 		url = ignoreQueryString ? getPathFromUrl(url) : url;
@@ -61,8 +61,8 @@ function search(url, onSuccess) {
 }
 
 function displayPosts(postList) {
-	var posts = postList.data.children;
-	var message = {
+	let posts = postList.data.children;
+	let message = {
 		// context for Handlebars template
 		context: {
 			numPosts: posts.length,
@@ -74,7 +74,7 @@ function displayPosts(postList) {
 
 function getCurrentTabUrl(callback) {
 	// Query filter to be passed to chrome.tabs.query
-	var queryInfo = {
+	let queryInfo = {
 		active: true,
 		currentWindow: true
 	};
