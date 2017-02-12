@@ -9,14 +9,17 @@ function init() {
 		});
 		return false;
 	});
+	
 	// receive updated html from template.html
 	window.addEventListener('message', function(event) {
 		if (event.data.html) {
 			$('#results').html(event.data.html);
 		}
 	});
+	
 	// search when 'Go' button pressed
 	$('#url-submit').click(render);
+	
 	// search when enter key pressed
 	$('#url').keyup(function(e) {
 		if (e.keyCode == 13) {
@@ -24,6 +27,7 @@ function init() {
 			e.stopPropagation();
 		}
 	});
+
 	render();
 }
 
@@ -76,9 +80,9 @@ function getCurrentTabUrl(callback) {
 	};
 
 	chrome.tabs.query(queryInfo, function(tabs) {
-		var url = tabs[0].url;
+		let url = tabs[0].url;
 		console.assert(typeof url == 'string', 'tab.url should be a string');
-		
+
 		callback(url);
 	});
 }
