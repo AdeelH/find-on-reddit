@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "Find on Reddit",
-  "description": "This extension shows all the submissions to Reddit of the current page's URL",
-  "version": "1.0",
+  "description": "Search for submissions of the current URL on Reddit",
+  "version": "1.0.1",
 
   "browser_action": {
     "default_icon": "icon-256.png",
