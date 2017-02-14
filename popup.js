@@ -10,9 +10,10 @@ function init() {
 		urlInput: $('#url'),
 		searchBtn: $('#url-submit'),
 		ytChoice: $('#yt-choice'),
+		ytCheckbox: $('#yt'),
 		ytVidId: $('#yt-vid-id'),
 		qsChoice: $('#qs-choice'),
-		qsCheckbox: $('#qs-choice'),
+		qsCheckbox: $('#ignore-qs'),
 	};
 
 	// open links in new tab
