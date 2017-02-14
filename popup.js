@@ -132,7 +132,7 @@ function getCurrentTabUrl(callback) {
 }
 
 /* Youtube video handling */
-const YT_REGEX = /https?:\/\/(?:(?:(?:www)|(?:m))\.)?(?:youtu\.be|youtube\.com)\/.*?(?:.*&)?v?[=\/]?([\w_-]{11})/;
+const YT_REGEX = /https?:\/\/(?:www\.|m\.|)youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/;
 
 function isYoutubeUrl(url) {
 	return YT_REGEX.test(url);
