@@ -10,6 +10,7 @@ function init() {
 		urlInput: $('#url'),
 		searchBtn: $('#url-submit'),
 		ytChoice: $('#yt-choice'),
+		ytVidId: $('#yt-vid-id'),
 		qsChoice: $('#qs-choice'),
 		qsCheckbox: $('#qs-choice'),
 	};
