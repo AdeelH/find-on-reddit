@@ -140,9 +140,10 @@ function isYoutubeUrl(url) {
 }
 
 function handleYoutubeUrl(url) {
-	let searchVideoId = $('#yt').prop('checked');
+	let searchVideoId = dom.ytCheckbox.prop('checked');
 	if (searchVideoId) {
 		let videoId = getYoutubeVideoId(url);
+		dom.ytVidId.text(`'${videoId}'`);
 		search(videoId);
 	}
 	else {
