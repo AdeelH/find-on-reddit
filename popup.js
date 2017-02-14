@@ -1,7 +1,9 @@
-$(document).ready(init);
 
+const baseUrl = 'https://api.reddit.com/search?sort=top&t=all';
 // DOM handles
 let dom;
+
+$(document).ready(init);
 
 function init() {
 	dom = {
@@ -80,33 +82,28 @@ function removeQueryString(url) {
 }
 
 function searchUrl(url) {
-	let requestUrl = `https://api.reddit.com/search?sort=top&t=all&type=link&q=url:${encodeURIComponent(url)}`;
-	makeApiRequest(requestUrl);
+	let requestUrl = `${baseUrl}&type=link&q=url:${encodeURIComponent(url)}`;
+	makeApiRequest(requestUrl, displayPosts);
 }
 
 function search(term) {
-	let requestUrl = `https://api.reddit.com/search?sort=top&t=all&q=url:${encodeURIComponent(term)}`;
-	makeApiRequest(requestUrl);
+	let requestUrl = `${baseUrl}&q=url:${encodeURIComponent(term)}`;
+	makeApiRequest(requestUrl, displayPosts);
 }
 
-function makeApiRequest(url, onSuccess = displayPosts, onError = onRequestError) {
+function makeApiRequest(url, onSuccess, onError = () => {}) {
 	dom.statusDiv.text('Searching ...');
 	$.ajax({
 		url: url,
 		success: [onSuccess, () => dom.statusDiv.text('')],
-		error: [
-			onError, 
-			() => {
-				dom.statusDiv.append(', retrying in 3s ...');
-				setTimeout(render, 3e3);
-			}
-		],
+		error: onError,
 		dataType: 'json'
 	});
 }
 
 function onRequestError(jqXHR, textStatus, errorThrown) {
-	dom.statusDiv.text(`${textStatus}`);
+	dom.statusDiv.text(`${textStatus}, retrying in 3s ...`);
+	setTimeout(render, 3e3);
 }
 
 function displayPosts(postList) {
