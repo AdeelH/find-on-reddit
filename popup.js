@@ -109,7 +109,14 @@ function onRequestError(jqXHR, textStatus, errorThrown) {
 function displayPosts(postList) {
 	let posts = postList.data.children;
 	if (posts.length) {
-		posts.forEach(p => p.data.age = calcAge(p.data.created));
+		posts.forEach(p => {
+			try {
+				p.data.age = calcAge(p.data.created_utc);
+			}
+			catch (e) {
+				p.data.age = '?';
+			}
+		});
 	}
 	let message = {
 		// context for Handlebars template
