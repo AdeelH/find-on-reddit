@@ -91,7 +91,7 @@ function search(term) {
 	makeApiRequest(requestUrl, displayPosts);
 }
 
-function makeApiRequest(url, onSuccess, onError = () => {}) {
+function makeApiRequest(url, onSuccess, onError = onRequestError) {
 	dom.statusDiv.text('Searching ...');
 	$.ajax({
 		url: url,
