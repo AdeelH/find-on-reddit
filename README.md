@@ -1,5 +1,9 @@
 # Find on Reddit
-Chrome extension that searches for submissions of the current URL on Reddit. [Link](https://chrome.google.com/webstore/detail/find-on-reddit/jbcdpeekakanklckgooknpbonojhjncm).
+Chrome extension that searches for submissions of the current URL on Reddit. 
+
+## Download
+  - Google Webstore: https://chrome.google.com/webstore/detail/find-on-reddit/jbcdpeekakanklckgooknpbonojhjncm  
+  - CRX file: https://github.com/AdeelH/find-on-reddit/releases/latest
 
 ## Features
   - searches for the URL of the current tab
