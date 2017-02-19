@@ -1,5 +1,5 @@
 
-const baseUrl = 'https://api.reddit.com/search?sort=top&t=all';
+const baseUrl = 'https://api.reddit.com/search?sort=top&t=all&limit=100';
 // DOM handles
 let dom;
 
