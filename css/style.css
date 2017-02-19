@@ -2,7 +2,8 @@ body
 {
   background-color: #ccc;
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-  width: 700px;
+  width: 600px;
+  font-size: 13px;
 }
 
 #main 
