@@ -55,7 +55,7 @@ a
   color: #999;
 }
 
-.night-mode input.form-control
+.night-mode .form-control
 {
 	background-color: #777;
 	color: white;
