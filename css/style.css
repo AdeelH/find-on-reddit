@@ -46,7 +46,12 @@ a
 
 .night-mode a
 {
-  color: #aaa;
+  color: #ccc;
+}
+
+.night-mode .post-details
+{
+  color: #999;
 }
 
 .night-mode input.form-control
