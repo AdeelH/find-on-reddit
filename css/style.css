@@ -34,9 +34,9 @@ td.subreddit
 	text-align: center;
 }
 
-a
+.score
 {
-  color: #444;
+  font-size: 15px;
 }
 
 .night-mode
@@ -47,12 +47,12 @@ a
 
 .night-mode a
 {
-  color: #ccc;
+  color: #ddd;
 }
 
 .night-mode .post-details
 {
-  color: #999;
+  color: #aaa;
 }
 
 .night-mode .form-control
