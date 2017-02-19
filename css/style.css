@@ -2,7 +2,7 @@ body
 {
   background-color: #ccc;
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-  width: 750px;
+  width: 700px;
 }
 
 #main 
@@ -24,10 +24,11 @@ body
 td 
 {
   padding: 10px;
-  vertical-align: middle;
+  vertical-align: middle !important;
 }
 
 td.score,
+td.post-thumbnail,
 td.subreddit
 {
 	text-align: center;
@@ -46,10 +47,15 @@ a
 
 .night-mode a
 {
-  color: #aaa;
+  color: #ccc;
 }
 
-.night-mode input.form-control
+.night-mode .post-details
+{
+  color: #999;
+}
+
+.night-mode .form-control
 {
 	background-color: #777;
 	color: white;
@@ -60,4 +66,9 @@ a
 {
 	background-color: #999;
 	color: white;
+}
+
+.search-status
+{
+  text-align: center;
 }

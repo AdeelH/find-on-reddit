@@ -1,5 +1,5 @@
 
-const baseUrl = 'https://api.reddit.com/search?sort=top&t=all';
+const baseUrl = 'https://api.reddit.com/search?sort=top&t=all&limit=100';
 // DOM handles
 let dom;
 
@@ -91,7 +91,7 @@ function search(term) {
 	makeApiRequest(requestUrl, displayPosts);
 }
 
-function makeApiRequest(url, onSuccess, onError = () => {}) {
+function makeApiRequest(url, onSuccess, onError = onRequestError) {
 	dom.statusDiv.text('Searching ...');
 	$.ajax({
 		url: url,
@@ -108,6 +108,9 @@ function onRequestError(jqXHR, textStatus, errorThrown) {
 
 function displayPosts(postList) {
 	let posts = postList.data.children;
+	if (posts.length) {
+		posts.forEach(p => p.data.age = calcAge(p.data.created));
+	}
 	let message = {
 		// context for Handlebars template
 		context: {
@@ -153,4 +156,25 @@ function handleYoutubeUrl(url) {
 function getYoutubeVideoId(url) {
 	let match = YT_REGEX.exec(url);
 	return match[1];
+}
+
+const timeUnits = [
+	{factor: 1e3, name: 'seconds', decis: 0 },
+	{factor: 60, name: 'minutes', decis: 0 },
+	{factor: 60, name: 'hours', decis: 0 },
+	{factor: 24, name: 'days', decis: 0 },
+	{factor: 30, name: 'months', decis: 0 },
+	{factor: 12, name: 'years', decis: 1 }
+];
+function calcAge(timestampSeconds) {
+	let diffMillis = Date.now() - (timestampSeconds * 1e3);
+	[n, unit] = timeUnits
+		.reduce((acc, u, i) => 
+			acc.concat([+(acc[i]/u.factor).toFixed(u.decis)]), [diffMillis])
+		.slice(1)
+		.map((n, i) => [n, timeUnits[i].name])
+		.reverse()
+		.find(([n, u]) => n > 1);
+	unit = (n === 1) ? unit.slice(0, -1) : unit; // make singular
+	return `${n} ${unit}`;
 }
