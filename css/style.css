@@ -2,7 +2,8 @@ body
 {
   background-color: #ccc;
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-  width: 700px;
+  width: 600px;
+  font-size: 13px;
 }
 
 #main 
@@ -28,15 +29,14 @@ td
 }
 
 td.score,
-td.post-thumbnail,
 td.subreddit
 {
 	text-align: center;
 }
 
-a
+.score
 {
-  color: #444;
+  font-size: 15px;
 }
 
 .night-mode
@@ -47,12 +47,12 @@ a
 
 .night-mode a
 {
-  color: #ccc;
+  color: #ddd;
 }
 
 .night-mode .post-details
 {
-  color: #999;
+  color: #aaa;
 }
 
 .night-mode .form-control

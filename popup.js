@@ -1,5 +1,5 @@
 
-const baseUrl = 'https://api.reddit.com/search?sort=top&t=all&limit=100';
+const baseUrl = 'https://api.reddit.com/search?sort=top&t=all&limit=100&q=url:';
 // DOM handles
 let dom;
 
@@ -49,67 +49,124 @@ function init() {
 }
 
 function render() {
+	setUIState('SEARCH_BEGIN');
 	let url = dom.urlInput.val();
-
-	if (!url) {
-		getCurrentTabUrl(url => {
-			dom.urlInput.val(url);
-			processUrl(url);
-		});
+	if (url) {
+		search(processUrl(url), showSearchEnd, false);
 	}
 	else {
-		processUrl(url);
+		getCurrentTabUrl(url => {
+			dom.urlInput.val(url);
+			search(processUrl(url), showSearchEnd);
+		});
 	}
+}
+
+function setUIState(state, params = null) {
+	switch(state) {
+		case 'SEARCH_BEGIN': dom.statusDiv.text('Searching ...'); break;
+		case 'SEARCH_END'  : dom.statusDiv.text(''); break;
+		case 'AJAX_ERROR': 
+			dom.statusDiv.text(`${params.textStatus}, retrying in 3s ...`); break;
+		case 'YT_VID': 
+			dom.qsChoice.addClass('hidden');
+			dom.ytChoice.removeClass('hidden');
+			dom.ytVidId.text(`'${params.id}'`);
+			break;
+		default:
+			dom.ytChoice.addClass('hidden');
+			dom.qsChoice.removeClass('hidden');
+
+	}
+}
+
+function showSearchEnd() {
+	setUIState('SEARCH_END');
 }
 
 function processUrl(url) {
 	if (isYoutubeUrl(url)) {
-		dom.qsChoice.addClass('hidden');
-		dom.ytChoice.removeClass('hidden');
-		handleYoutubeUrl(url);
-		return;
+		setUIState('YT_VID');
+		return processYoutubeUrl(url);
 	}
-	dom.ytChoice.addClass('hidden');
-	dom.qsChoice.removeClass('hidden');
+	setUIState('DEFAULT');
 
 	let ignoreQueryString = dom.qsCheckbox.prop('checked');
 	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
-	searchUrl(urlToSearch);
+	return urlToSearch;
 }
 
 function removeQueryString(url) {
 	return url.split(/[?#]/)[0];
 }
 
-function searchUrl(url) {
-	let requestUrl = `${baseUrl}&type=link&q=url:${encodeURIComponent(url)}`;
-	makeApiRequest(requestUrl, displayPosts);
+function search(term, callback, useCache = true) {
+	let query = encodeURIComponent(term);
+	let requestUrl = `${baseUrl}${query}`;
+	if (!useCache) {
+		makeApiRequest(requestUrl, posts => {
+			displayPosts(posts);
+			callback();
+		});
+		return;
+	}
+	chrome.storage.local.get(query, cache => {
+	    let data = cache[query];
+		if (isCacheValid(data)) {
+			displayPosts(data.posts);
+			callback();
+		} else {
+			makeApiRequest(`${baseUrl}${query}`, posts => {
+				displayPosts(posts);
+				callback();
+				cachePosts(query, posts);
+			});
+		}
+	});
 }
 
-function search(term) {
-	let requestUrl = `${baseUrl}&q=url:${encodeURIComponent(term)}`;
-	makeApiRequest(requestUrl, displayPosts);
+function cachePosts(query, posts) {
+	let objectToStore = {};
+	objectToStore[query] = {
+		posts: posts,
+		time: Date.now()
+	};
+	// no need to clutter local storage, thus clear()
+	chrome.storage.local.clear(() => {
+		chrome.storage.local.set(objectToStore);
+	});
+}
+
+const CACHE_AGE_LIMIT_MILLIS = 1e3 * 60 * 15; // 15 minutes
+function isCacheValid(data) {
+	return data && data.time && (Date.now() - data.time) < CACHE_AGE_LIMIT_MILLIS;
 }
 
 function makeApiRequest(url, onSuccess, onError = onRequestError) {
-	dom.statusDiv.text('Searching ...');
 	$.ajax({
 		url: url,
-		success: [onSuccess, () => dom.statusDiv.text('')],
+		success: onSuccess,
 		error: onError,
 		dataType: 'json'
 	});
 }
 
 function onRequestError(jqXHR, textStatus, errorThrown) {
-	dom.statusDiv.text(`${textStatus}, retrying in 3s ...`);
+	setUIState('AJAX_ERROR', {textStatus: textStatus});
 	setTimeout(render, 3e3);
 }
 
 function displayPosts(postList) {
 	let posts = postList.data.children;
 	if (posts.length) {
-		posts.forEach(p => p.data.age = calcAge(p.data.created));
+		posts.forEach(p => {
+			try {
+				p.data.age = calcAge(p.data.created_utc);
+			}
+			catch (e) {
+				p.data.age = '?';
+			}
+		});
 	}
 	let message = {
 		// context for Handlebars template
@@ -141,16 +198,11 @@ function isYoutubeUrl(url) {
 	return YT_REGEX.test(url);
 }
 
-function handleYoutubeUrl(url) {
-	let searchVideoId = dom.ytCheckbox.prop('checked');
-	if (searchVideoId) {
-		let videoId = getYoutubeVideoId(url);
-		dom.ytVidId.text(`'${videoId}'`);
-		search(videoId);
-	}
-	else {
-		searchUrl(url);
-	}
+function processYoutubeUrl(url) {
+	let videoId = getYoutubeVideoId(url);
+	setUIState('YT_VID', {id: videoId});
+	let useVideoId = dom.ytCheckbox.prop('checked');
+	return useVideoId ? videoId : url;
 }
 
 function getYoutubeVideoId(url) {
