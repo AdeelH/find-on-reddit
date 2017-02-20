@@ -86,7 +86,6 @@ function showSearchEnd() {
 
 function processUrl(url) {
 	if (isYoutubeUrl(url)) {
-		setUIState('YT_VID');
 		return processYoutubeUrl(url);
 	}
 	setUIState('DEFAULT');
