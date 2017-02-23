@@ -50,15 +50,16 @@ function init() {
 
 function render() {
 	setUIState('SEARCH_BEGIN');
-	let url = dom.urlInput.val();
-	if (url) {
-		search(processUrl(url), showSearchEnd, false);
+	let urlInput = dom.urlInput.val();
+	if (urlInput) {
+		findOnReddit(urlInput, false).then(showSearchEnd);
 	}
 	else {
-		getCurrentTabUrl(url => {
+		getCurrentTabUrl(url).then(url => {
 			dom.urlInput.val(url);
-			search(processUrl(url), showSearchEnd);
-		});
+			return findOnReddit(url);
+		})
+		.then(showSearchEnd);
 	}
 }
 
@@ -99,28 +100,34 @@ function removeQueryString(url) {
 	return url.split(/[?#]/)[0];
 }
 
-function search(term, callback, useCache = true) {
-	let query = encodeURIComponent(term);
+function findOnReddit(url, useCache = true) {
+	let query = encodeURIComponent(processUrl(url));
+	return search(query, useCache)
+		.then(posts => {
+			displayPosts(posts);
+			cachePosts(query, posts);
+		})
+		.catch(onRequestError);
+}
+
+function search(query, useCache = true) {
 	let requestUrl = `${baseUrl}${query}`;
 	if (!useCache) {
-		makeApiRequest(requestUrl, posts => {
-			displayPosts(posts);
-			callback();
-		});
-		return;
+		return makeApiRequest(requestUrl);
 	}
-	chrome.storage.local.get(query, cache => {
+	return searchCache(query).then(cache => {
 	    let data = cache[query];
 		if (isCacheValid(data)) {
-			displayPosts(data.posts);
-			callback();
+			return Promise.resolve(data.posts);
 		} else {
-			makeApiRequest(`${baseUrl}${query}`, posts => {
-				displayPosts(posts);
-				callback();
-				cachePosts(query, posts);
-			});
+			return makeApiRequest(requestUrl);
 		}
+	});
+}
+
+function searchCache(query) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.local.get(query, resolve);
 	});
 }
 
@@ -130,9 +137,11 @@ function cachePosts(query, posts) {
 		posts: posts,
 		time: Date.now()
 	};
-	// no need to clutter local storage, thus clear()
-	chrome.storage.local.clear(() => {
-		chrome.storage.local.set(objectToStore);
+	return new Promise((resolve, reject) => {
+		// no need to clutter local storage, thus clear()
+		chrome.storage.local.clear(() => {
+			chrome.storage.local.set(objectToStore, resolve);
+		});
 	});
 }
 
@@ -141,12 +150,9 @@ function isCacheValid(data) {
 	return data && data.time && (Date.now() - data.time) < CACHE_AGE_LIMIT_MILLIS;
 }
 
-function makeApiRequest(url, onSuccess, onError = onRequestError) {
-	$.ajax({
-		url: url,
-		success: onSuccess,
-		error: onError,
-		dataType: 'json'
+function makeApiRequest(url) {
+	return new Promise((resolve, reject) => {
+		$.get(url).done(resolve).fail(reject);
 	});
 }
 
@@ -177,16 +183,13 @@ function displayPosts(postList) {
 	document.getElementById('tFrame').contentWindow.postMessage(message, '*');
 }
 
-function getCurrentTabUrl(callback) {
+function getCurrentTabUrl() {
 	let queryOptions = {
 		active: true,
 		currentWindow: true
 	};
-
-	chrome.tabs.query(queryOptions, tabs => {
-		let url = tabs[0].url;
-		console.assert(typeof url == 'string', 'tab.url should be a string');
-		callback(url);
+	return new Promise((resolve, reject) => {
+		chrome.tabs.query(queryOptions, tabs => resolve(tabs[0].url));
 	});
 }
 
