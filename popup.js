@@ -19,7 +19,7 @@ function init() {
 	};
 
 	// open links in new tab
-	$('body').on('click', 'a', function(){
+	$('body').on('click', 'a', function() {
 		chrome.tabs.create({
 			url: $(this).attr('href'),
 			active: false
@@ -28,9 +28,9 @@ function init() {
 	});
 
 	// receive updated html from template.html
-	window.addEventListener('message', function(event) {
-		if (event.data.html) {
-			dom.resultsDiv.html(event.data.html);
+	window.addEventListener('message', e => {
+		if (e.data.html) {
+			dom.resultsDiv.html(e.data.html);
 		}
 	});
 
@@ -77,7 +77,6 @@ function setUIState(state, params = null) {
 		default:
 			dom.ytChoice.addClass('hidden');
 			dom.qsChoice.removeClass('hidden');
-
 	}
 }
 
@@ -156,9 +155,10 @@ function makeApiRequest(url) {
 	});
 }
 
+const AJAX_RETRY_DELAY = 3e3;
 function onRequestError(jqXHR, textStatus, errorThrown) {
 	setUIState('AJAX_ERROR', {textStatus: textStatus});
-	setTimeout(render, 3e3);
+	setTimeout(render, AJAX_RETRY_DELAY);
 }
 
 function displayPosts(postList) {
@@ -173,14 +173,14 @@ function displayPosts(postList) {
 			}
 		});
 	}
-	let message = {
+	let msg = {
 		// context for Handlebars template
 		context: {
 			numPosts: posts.length,
 			posts: posts
 		}
 	};
-	document.getElementById('tFrame').contentWindow.postMessage(message, '*');
+	document.getElementById('tFrame').contentWindow.postMessage(msg, '*');
 }
 
 function getCurrentTabUrl() {
