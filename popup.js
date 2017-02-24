@@ -51,16 +51,17 @@ function init() {
 function render() {
 	setUIState('SEARCH_BEGIN');
 	let urlInput = dom.urlInput.val();
+	let searchResults;
 	if (urlInput) {
-		findOnReddit(urlInput, false).then(showSearchEnd);
+		searchResults = findOnReddit(urlInput, false);
 	}
 	else {
-		getCurrentTabUrl(url).then(url => {
+		searchResults = getCurrentTabUrl(url).then(url => {
 			dom.urlInput.val(url);
 			return findOnReddit(url);
-		})
-		.then(showSearchEnd);
+		});
 	}
+	searchResults.then(setUIState('SEARCH_END'));
 }
 
 function setUIState(state, params = null) {
@@ -78,10 +79,6 @@ function setUIState(state, params = null) {
 			dom.ytChoice.addClass('hidden');
 			dom.qsChoice.removeClass('hidden');
 	}
-}
-
-function showSearchEnd() {
-	setUIState('SEARCH_END');
 }
 
 function processUrl(url) {
