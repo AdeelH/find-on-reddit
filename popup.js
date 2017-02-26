@@ -61,7 +61,9 @@ function render() {
 			return findOnReddit(url);
 		});
 	}
-	searchResults.then(setUIState('SEARCH_END'));
+	searchResults
+	.then(() => setUIState('SEARCH_END'))
+	.catch(onRequestError);
 }
 
 function setUIState(state, params = null) {
@@ -102,8 +104,7 @@ function findOnReddit(url, useCache = true) {
 		.then(posts => {
 			displayPosts(posts);
 			cachePosts(query, posts);
-		})
-		.catch(onRequestError);
+		});
 }
 
 function search(query, useCache = true) {
@@ -153,8 +154,8 @@ function makeApiRequest(url) {
 }
 
 const AJAX_RETRY_DELAY = 3e3;
-function onRequestError(jqXHR, textStatus, errorThrown) {
-	setUIState('AJAX_ERROR', {textStatus: textStatus});
+function onRequestError(error) {
+	setUIState('AJAX_ERROR', {msg: error.statusText});
 	setTimeout(render, AJAX_RETRY_DELAY);
 }
 
