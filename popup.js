@@ -68,10 +68,12 @@ function render() {
 
 function setUIState(state, params = null) {
 	switch(state) {
-		case 'SEARCH_BEGIN': dom.statusDiv.text('Searching ...'); break;
-		case 'SEARCH_END'  : dom.statusDiv.text(''); break;
-		case 'AJAX_ERROR': 
-			dom.statusDiv.text(`${params.textStatus}, retrying in 3s ...`); break;
+		case 'SEARCH_BEGIN':
+			dom.statusDiv.text('Searching ...'); break;
+		case 'SEARCH_END':
+			dom.statusDiv.text(''); break;
+		case 'AJAX_ERROR':
+			dom.statusDiv.text(`${params.msg}, retrying in 3s ...`); break;
 		case 'YT_VID': 
 			dom.qsChoice.addClass('hidden');
 			dom.ytChoice.removeClass('hidden');
