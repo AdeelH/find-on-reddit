@@ -213,22 +213,19 @@ function getYoutubeVideoId(url) {
 }
 
 const timeUnits = [
-	{factor: 1e3, name: 'seconds', decis: 0 },
-	{factor: 60, name: 'minutes', decis: 0 },
-	{factor: 60, name: 'hours', decis: 0 },
-	{factor: 24, name: 'days', decis: 0 },
-	{factor: 30, name: 'months', decis: 0 },
-	{factor: 12, name: 'years', decis: 1 }
+	{factor: 1/(1e3), name: 'seconds', decis: 0 },
+	{factor: 1/(1e3*60), name: 'minutes', decis: 0 },
+	{factor: 1/(1e3*60*60), name: 'hours', decis: 0 },
+	{factor: 1/(1e3*60*60*24), name: 'days', decis: 0 },
+	{factor: 1/(1e3*60*60*24*30), name: 'months', decis: 0 },
+	{factor: 1/(1e3*60*60*24*30*12), name: 'years', decis: 1 }
 ];
 function calcAge(timestampSeconds) {
 	let diffMillis = Date.now() - (timestampSeconds * 1e3);
-	[n, unit] = timeUnits
-		.reduce((acc, u, i) => 
-			acc.concat([+(acc[i]/u.factor).toFixed(u.decis)]), [diffMillis])
-		.slice(1)
-		.map((n, i) => [n, timeUnits[i].name])
+	let [n, unit] = timeUnits
+		.map(t => [+(diffMillis * t.factor).toFixed(t.decis), t.name])
 		.reverse()
-		.find(([n, u]) => n > 1);
-	unit = (n === 1) ? unit.slice(0, -1) : unit; // make singular
+		.find(([n, u]) => n >= 1);
+	unit = (n === 1) ? unit.slice(0, -1) : unit; // singular/plural
 	return `${n} ${unit}`;
 }
