@@ -202,9 +202,13 @@ function isYoutubeUrl(url) {
 
 function processYoutubeUrl(url) {
 	let videoId = getYoutubeVideoId(url);
-	setUIState('YT_VID', {id: videoId});
 	let useVideoId = dom.ytCheckbox.prop('checked');
-	return useVideoId ? videoId : url;
+	setUIState('YT_VID', {id: videoId});
+	if (!useVideoId) {
+		return url;
+	}
+	let videoIdWithoutLeadingDashes = /^-*(.*)/.exec(videoId)[1];
+	return videoIdWithoutLeadingDashes;
 }
 
 function getYoutubeVideoId(url) {
