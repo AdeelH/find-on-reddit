@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<!-- styles -->
+	    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	    <link rel="stylesheet" type="text/css" href="css/options.css">
+	    <!-- title -->
+		<title>Options - Find on Reddit</title>
+	</head>
+	<body>
+		<div class="container">
+			<!-- heading -->
+			<h2>Options</h2>
+			<!-- form -->
+			<form class="form">
+				<div class="form-group">
+					<!-- autorun? -->
+				    <div class="checkbox input-group">
+				        <label>
+							<input type="checkbox" id="autorun">
+							<span>Do not search until popup is opened</span>
+				        </label>
+				    </div>
+				    <!-- status -->
+					<div id="status"></div>
+					<!-- save -->
+					<button id="save" type="button" class="btn btn-default">Save</button>
+				</div>
+			</form>
+		</div>
+		<!-- scripts -->
+	    <script src="chrome.js"></script>
+	    <script src="options.js"></script>
+	</body>
+</html>
