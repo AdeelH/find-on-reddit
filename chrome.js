@@ -9,6 +9,12 @@ function getCurrentTabUrl() {
 	});
 }
 
+function getTabById(tabId) {
+	return new Promise((resolve, reject) => {
+		chrome.tabs.get(tabId, resolve);
+	});
+}
+
 function searchCache(query) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.local.get(query, resolve);
@@ -30,4 +36,22 @@ function cache(data) {
 const CACHE_AGE_LIMIT_MILLIS = 1e3 * 60 * 15; // 15 minutes
 function isCacheValid(data) {
 	return data && data.time && (Date.now() - data.time) < CACHE_AGE_LIMIT_MILLIS;
+}
+
+function updateOptions(data) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.set({ options: data }, resolve);
+	});
+}
+
+function getOptions(query) {
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.get(query, data => resolve(data.options));
+	});
+}
+
+function reloadBackgroundPage() {
+	return new Promise((resolve, reject) => {
+		chrome.runtime.getBackgroundPage(bgPage => resolve(bgPage.location.reload()));
+	});
 }
