@@ -1,5 +1,3 @@
-
-const baseUrl = 'https://api.reddit.com/search?sort=top&t=all&limit=100&q=url:';
 // DOM handles
 let dom;
 
@@ -35,7 +33,7 @@ function init() {
 	});
 
 	// search when search button pressed
-	dom.searchBtn.click(render);
+	dom.searchBtn.click(() => render(true));
 
 	// search when enter key pressed
 	dom.urlInput.keyup(function(e) {
@@ -48,22 +46,32 @@ function init() {
 	render();
 }
 
-function render() {
+function render(userClicked = false) {
 	setUIState('SEARCH_BEGIN');
+	let urlPromise = getUrl();
+	let ignoreQueryString = dom.qsCheckbox.prop('checked');
+
+	urlPromise.then(updateUiBasedOnUrl);
+	urlPromise
+		.then(url => {
+			let urlToSearch = processUrl(url, ignoreQueryString);
+			return findOnReddit(urlToSearch, !userClicked);
+		})
+		.then(displayPosts)
+		.then(() => setUIState('SEARCH_END'))
+		.catch(onRequestError);
+}
+
+function getUrl() {
 	let urlInput = dom.urlInput.val();
-	let searchResults;
 	if (urlInput) {
-		searchResults = findOnReddit(urlInput, false);
+		return Promise.resolve(urlInput);
 	}
 	else {
-		searchResults = getCurrentTabUrl(url).then(url => {
-			dom.urlInput.val(url);
-			return findOnReddit(url);
-		});
+		let urlPromise = getCurrentTabUrl(url);
+		urlPromise.then(url => dom.urlInput.val(url));
+		return urlPromise;
 	}
-	searchResults
-	.then(() => setUIState('SEARCH_END'))
-	.catch(onRequestError);
 }
 
 function setUIState(state, params = null) {
@@ -85,19 +93,13 @@ function setUIState(state, params = null) {
 	}
 }
 
-function processUrl(url) {
+function updateUiBasedOnUrl(url) {
 	if (isYoutubeUrl(url)) {
-		return processYoutubeUrl(url);
+		setUIState('YT_VID', {id: getYoutubeVideoId(url)});
 	}
-	setUIState('DEFAULT');
-
-	let ignoreQueryString = dom.qsCheckbox.prop('checked');
-	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
-	return urlToSearch;
-}
-
-function removeQueryString(url) {
-	return url.split(/[?#]/)[0];
+	else {
+		setUIState('DEFAULT');
+	}
 }
 
 const AJAX_RETRY_DELAY = 3e3;
@@ -126,29 +128,6 @@ function displayPosts(postList) {
 		}
 	};
 	document.getElementById('tFrame').contentWindow.postMessage(msg, '*');
-}
-
-/* Youtube video handling */
-const YT_REGEX = /https?:\/\/(?:www\.|m\.|)youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/;
-
-function isYoutubeUrl(url) {
-	return YT_REGEX.test(url);
-}
-
-function processYoutubeUrl(url) {
-	let videoId = getYoutubeVideoId(url);
-	let useVideoId = dom.ytCheckbox.prop('checked');
-	setUIState('YT_VID', {id: videoId});
-	if (!useVideoId) {
-		return url;
-	}
-	let videoIdWithoutLeadingDashes = /^-*(.*)/.exec(videoId)[1];
-	return videoIdWithoutLeadingDashes;
-}
-
-function getYoutubeVideoId(url) {
-	let match = YT_REGEX.exec(url);
-	return match[1];
 }
 
 const timeUnits = [
