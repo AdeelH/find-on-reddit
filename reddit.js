@@ -1,11 +1,10 @@
 const baseUrl = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
 
 function findOnReddit(url, useCache = true) {
-	return search(query, useCache).then(posts => {
-			displayPosts(posts);
-			cachePosts(query, posts);
-		});
 	let query = encodeURIComponent(url);
+	let results = search(query, useCache);
+	results.then(res => cachePosts(query, res));
+	return results.then(res => res.data.children);
 }
 
 function search(query, useCache = true) {
@@ -29,7 +28,7 @@ function cachePosts(query, posts) {
 		posts: posts,
 		time: Date.now()
 	};
-	clearCache().then(() => cache(objectToStore));
+	return cache(objectToStore);
 }
 
 function makeApiRequest(url) {

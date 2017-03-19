@@ -108,8 +108,10 @@ function onRequestError(error) {
 	setTimeout(render, AJAX_RETRY_DELAY);
 }
 
-function displayPosts(postList) {
-	let posts = postList.data.children;
+function displayPosts(posts) {
+	if (!posts) {
+		return;
+	}
 	if (posts.length) {
 		posts.forEach(p => {
 			try {
@@ -131,12 +133,12 @@ function displayPosts(postList) {
 }
 
 const timeUnits = [
-	{factor: 1/(1e3), name: 'seconds', decis: 0 },
-	{factor: 1/(1e3*60), name: 'minutes', decis: 0 },
-	{factor: 1/(1e3*60*60), name: 'hours', decis: 0 },
-	{factor: 1/(1e3*60*60*24), name: 'days', decis: 0 },
-	{factor: 1/(1e3*60*60*24*30), name: 'months', decis: 0 },
-	{factor: 1/(1e3*60*60*24*30*12), name: 'years', decis: 1 }
+	{factor: 1/(1e3), name: 'seconds', decis: 0},
+	{factor: 1/(1e3*60), name: 'minutes', decis: 0},
+	{factor: 1/(1e3*60*60), name: 'hours', decis: 0},
+	{factor: 1/(1e3*60*60*24), name: 'days', decis: 0},
+	{factor: 1/(1e3*60*60*24*30), name: 'months', decis: 0},
+	{factor: 1/(1e3*60*60*24*30*12), name: 'years', decis: 1}
 ];
 function calcAge(timestampSeconds) {
 	let diffMillis = Date.now() - (timestampSeconds * 1e3);
