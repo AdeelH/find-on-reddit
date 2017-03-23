@@ -21,9 +21,10 @@ function notifyFailure() {
 
 function restoreOptions() {
 	let query = {
-		options: {
-			autorun: true
-		}
+		autorun: {
+			updated: true,
+			activated: true
+		},
 	};
 	getOptions(query).then(options => {
 		document.getElementById('autorun').checked = !options.autorun;

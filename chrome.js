@@ -46,7 +46,7 @@ function updateOptions(data) {
 
 function getOptions(query) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.sync.get(query, data => resolve(data.options));
+		chrome.storage.sync.get({options: query}, data => resolve(data.options));
 	});
 }
 

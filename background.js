@@ -4,12 +4,16 @@ const BADGE_COLORS = {
 };
 
 (function init() {
+	// Avoid storage bloat. Ideally, this should happen on browser exit, 
+	// but the Chrome API doesn't provide an event for that
 	clearCache();
-	let query = {
-		options: { autorun: true }
-	};
+
+	let query = { 
+		autorun: {
+			updated: true,
+			activated: true
 		}
-	});
+	};
 	getOptions(query).then(registerHandlers);
 })();
 
