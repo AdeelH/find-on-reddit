@@ -48,6 +48,8 @@ function restoreOptions() {
 		document.getElementById('autorun-updated').checked = options.autorun.updated;
 		document.getElementById('autorun-activated').checked = options.autorun.activated;
 		document.getElementById('cache-period').value = options.cache.period;
+		document.getElementById('popup-newtab').checked = options.popup.newtab;
+		document.getElementById('popup-newtab-bg').checked = options.popup.newtabInBg;
 	});
 }
 
