@@ -1,7 +1,3 @@
-
-const REJECT_REASON = {
-	chromeUrl: 'chromeUrl',
-};
 const BADGE_COLORS = {
 	error: '#DD1616',
 	success: '#717171'
@@ -36,24 +32,19 @@ function registerHandlers() {
 }
 
 function autoFind(tabId, url) {
-	checkIfAllowed(url)
-		.then(url => findOnReddit(processUrl(url)))
-		.then(posts => setResultsBadge(tabId, `${posts.length}`))
-		.catch(e => handleError(e, tabId));
+	if (isAllowed(url)) {
+		return findOnReddit(processUrl(url))
+			.then(posts => setResultsBadge(tabId, `${posts.length}`))
+			.catch(e => handleError(e, tabId));
+	}
 }
 
-function checkIfAllowed(url) {
-	if (isChromeUrl(url)) {
-		return Promise.reject(REJECT_REASON.chromeUrl);
-	}
-	return Promise.resolve(url);
+function isAllowed(url) {
+	return !isChromeUrl(url);
 }
 
 function handleError(e, tabId) {
-	switch (e) {
-		case REJECT_REASON.chromeUrl: break;
-		default: setErrorBadge(tabId);
-	}
+	return setErrorBadge(tabId);
 }
 
 function isChromeUrl(url) {
@@ -61,18 +52,22 @@ function isChromeUrl(url) {
 }
 
 function setErrorBadge(tabId) {
-	setBadge(tabId, 'X', BADGE_COLORS.error);
+	return setBadge(tabId, 'X', BADGE_COLORS.error);
 }
 
 function setResultsBadge(tabId, text) {
-	setBadge(tabId, text, BADGE_COLORS.success);
+	return setBadge(tabId, text, BADGE_COLORS.success);
 }
 
 function setBadge(tabId, text, color) {
 	let badge = { text: text, tabId: tabId };
-	chrome.browserAction.setBadgeText(badge);
-	if (color) {
-		let bg = { color: color, tabId: tabId };
-		chrome.browserAction.setBadgeBackgroundColor(bg);
-	}
+	let bgCol = { color: color, tabId: tabId };
+	return getTabById(tabId).then(tab => {
+		if (!chrome.runtime.lastError) {
+			chrome.browserAction.setBadgeText(badge);
+		}
+		if (!chrome.runtime.lastError) {
+			chrome.browserAction.setBadgeBackgroundColor(bgCol);
+		}
+	}).catch(ignoreRejection);
 }
