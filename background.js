@@ -8,27 +8,24 @@ const BADGE_COLORS = {
 	let query = {
 		options: { autorun: true }
 	};
-	getOptions(query).then(options => {
-		if (options.autorun) {
-			registerHandlers();
 		}
 	});
+	getOptions(query).then(registerHandlers);
 })();
 
-function registerHandlers() {
-	chrome.tabs.onCreated.addListener(tab => {
-		autoFind(tab.id, tab.url);
-	});
+function registerHandlers(options) {
+	if (options.autorun.updated) {
+		chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
+			autoFind(tabId, tab.url);
+		});
+	}
 
-	chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-		autoFind(tabId, tab.url);
-	});
-
-	chrome.tabs.onActivated.addListener(activeInfo => {
-		let tabId = activeInfo.tabId;
-		getTabById(tabId)
-			.then(tab => autoFind(tab.id, tab.url));
-	});
+	if (options.autorun.activated) {
+		chrome.tabs.onActivated.addListener(activeInfo => {
+			let tabId = activeInfo.tabId;
+			getTabById(tabId).then(tab => autoFind(tabId, tab.url));
+		});
+	}
 }
 
 function autoFind(tabId, url) {
