@@ -3,7 +3,7 @@ const baseUrl = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=u
 function findOnReddit(url, useCache = true) {
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache);
-	results.then(res => cachePosts(query, res));
+	results.then(res => cachePosts(query, res)).catch(ignoreRejection);
 	return results.then(res => res.data.children);
 }
 
@@ -12,14 +12,9 @@ function search(query, useCache = true) {
 	if (!useCache) {
 		return makeApiRequest(requestUrl);
 	}
-	return searchCache(query).then(cache => {
-	    let data = cache[query];
-		if (isCacheValid(data)) {
-			return Promise.resolve(data.posts);
-		} else {
-			return makeApiRequest(requestUrl);
-		}
-	});
+	return searchCache(query)
+		.then(cache => checkCacheValidity(cache[query]))
+		.then(isValid => isValid ? data.posts : makeApiRequest(requestUrl));
 }
 
 function cachePosts(query, posts) {

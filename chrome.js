@@ -33,9 +33,14 @@ function cache(data) {
 	});
 }
 
-const CACHE_AGE_LIMIT_MILLIS = 1e3 * 60 * 15; // 15 minutes
-function isCacheValid(data) {
-	return data && data.time && (Date.now() - data.time) < CACHE_AGE_LIMIT_MILLIS;
+const DEFAULT_CACHE_PERIOD_MINS = 30;
+function checkCacheValidity(data) {
+	if (!(data && data.time)) {
+		return Promise.resolve(false);
+	}
+	let diff = Date.now() - data.time;
+	let query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
+	return getOptions(query).then(cahce => diff < +(cache.period) * 60e3);
 }
 
 function updateOptions(data) {

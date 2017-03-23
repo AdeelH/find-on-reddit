@@ -4,6 +4,7 @@ function saveOptions() {
 			updated: document.getElementById('autorun-updated').checked,
 			activated: document.getElementById('autorun-activated').checked
 		},
+		cache: { period: document.getElementById('cache-period').value }
 	};
 	updateOptions(options)
 		.then(notifySuccess)
@@ -30,10 +31,12 @@ function restoreOptions() {
 			updated: true,
 			activated: true
 		},
+		cache: { period: DEFAULT_CACHE_PERIOD_MINS }
 	};
 	getOptions(query).then(options => {
 		document.getElementById('autorun-updated').checked = options.autorun.updated;
 		document.getElementById('autorun-activated').checked = options.autorun.activated;
+		document.getElementById('cache-period').value = options.cache.period;
 	});
 }
 
