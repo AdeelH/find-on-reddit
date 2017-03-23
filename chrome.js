@@ -1,17 +1,29 @@
 
 function getCurrentTabUrl() {
-	let queryOptions = {
+	return getCurrentTab().then(tab => tab.url);
+}
+
+function getCurrentTab() {
+	let query = {
 		active: true,
 		currentWindow: true
 	};
 	return new Promise((resolve, reject) => {
-		chrome.tabs.query(queryOptions, tabs => resolve(tabs[0].url));
+		chrome.tabs.query(query, tabs => resolve(tabs[0]));
 	});
 }
 
 function getTabById(tabId) {
 	return new Promise((resolve, reject) => {
 		chrome.tabs.get(tabId, resolve);
+	});
+}
+
+function navigateTo(url) {
+	return getCurrentTab().then(tab => {
+		if (!chrome.runtime.lastError) {
+			chrome.tabs.update(tab.id, {url: url});
+		}
 	});
 }
 

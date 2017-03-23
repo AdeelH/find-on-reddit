@@ -16,13 +16,29 @@ function init() {
 		qsCheckbox: $('#ignore-qs'),
 	};
 
+	let query = {
+		popup: {
+			newab: true,
+			newtabInBg: true
+		}
+	};
+	getOptions(query)
+		.then(opts => registerHandlers(opts.popup))
+		.then(render);
+}
+
+function registerHandlers(opts) {
 	// open links in new tab
 	$('body').on('click', 'a', function() {
-		chrome.tabs.create({
-			url: $(this).attr('href'),
-			active: false
-		});
-		return false;
+		let clickedUrl = $(this).attr('href');
+		if (opts.newtab) {
+			chrome.tabs.create({
+				url: clickedUrl,
+				active: !opts.newtabInBg
+			});
+		} else {
+			navigateTo(clickedUrl);
+		}
 	});
 
 	// receive updated html from template.html
@@ -42,8 +58,6 @@ function init() {
 			e.stopPropagation();
 		}
 	});
-
-	render();
 }
 
 function render(userClicked = false) {

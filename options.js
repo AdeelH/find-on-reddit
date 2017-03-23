@@ -4,7 +4,11 @@ function saveOptions() {
 			updated: document.getElementById('autorun-updated').checked,
 			activated: document.getElementById('autorun-activated').checked
 		},
-		cache: { period: document.getElementById('cache-period').value }
+		cache: { period: document.getElementById('cache-period').value },
+		popup: {
+			newtab: document.getElementById('popup-newtab').checked,
+			newtabInBg: document.getElementById('popup-newtab-bg').checked
+		}
 	};
 	updateOptions(options)
 		.then(notifySuccess)
@@ -31,7 +35,11 @@ function restoreOptions() {
 			updated: true,
 			activated: true
 		},
-		cache: { period: DEFAULT_CACHE_PERIOD_MINS }
+		cache: { period: DEFAULT_CACHE_PERIOD_MINS },
+		popup: {
+			newtab: true,
+			newtabInBg: true
+		}
 	};
 	getOptions(query).then(options => {
 		document.getElementById('autorun-updated').checked = options.autorun.updated;
