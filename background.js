@@ -4,7 +4,7 @@ const REJECT_REASON = {
 };
 const BADGE_COLORS = {
 	error: '#DD1616',
-	success: '#1996FF'
+	success: '#717171'
 };
 
 (function init() {
