@@ -1,6 +1,9 @@
 function saveOptions() {
 	let options = {
-		autorun: !document.getElementById('autorun').checked
+		autorun: {
+			updated: document.getElementById('autorun-updated').checked,
+			activated: document.getElementById('autorun-activated').checked
+		},
 	};
 	updateOptions(options)
 		.then(notifySuccess)
@@ -10,12 +13,14 @@ function saveOptions() {
 
 function notifySuccess() {
 	let status = document.getElementById('status');
+	status.classList.add('success');
 	status.textContent = 'Saved!';
 	setTimeout(() => status.textContent = '', 750);
 }
 
 function notifyFailure() {
 	let status = document.getElementById('status');
+	status.classList.add('failure');
 	status.textContent = 'Error saving options';
 }
 
@@ -27,7 +32,8 @@ function restoreOptions() {
 		},
 	};
 	getOptions(query).then(options => {
-		document.getElementById('autorun').checked = !options.autorun;
+		document.getElementById('autorun-updated').checked = options.autorun.updated;
+		document.getElementById('autorun-activated').checked = options.autorun.activated;
 	});
 }
 

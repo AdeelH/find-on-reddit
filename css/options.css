@@ -1,0 +1,45 @@
+.option-section-heading
+{
+	margin-bottom: 10px;
+}
+
+.option-desc
+{
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 7px;
+}
+
+.option-checkbox-container
+{
+	margin-bottom: 5px;
+}
+
+.option-checkbox
+{
+	width: auto;
+}
+
+.save-status
+{
+	font-size: 18px;
+	margin-bottom: 10px;
+	margin-top: 4px;
+}
+
+.save-status.success
+{
+	color: green;
+}
+
+.save-status.failure
+{
+	color: red;
+}
+
+.form-control-sm
+{
+	display: inline !important;
+    min-width: 0;
+	width: auto !important;
+}

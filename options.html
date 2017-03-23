@@ -9,21 +9,33 @@
 	<body>
 		<div class="container">
 			<!-- heading -->
-			<h2>Options</h2>
+			<h1>Options</h1>
+			<hr>
 			<!-- form -->
 			<form class="form">
-				<div class="form-group">
-					<!-- autorun? -->
-				    <div class="checkbox input-group">
-				        <label>
-							<input type="checkbox" id="autorun">
-							<span>Do not search until popup is opened</span>
-				        </label>
+				<!-- autorun -->
+				<h3 class="option-section-heading">Auto-search</h3>
+				<div class="form-group container">
+			    	<div class="option-desc">Search/re-search when</div>
+				    <div class="container input-group">
+				    	<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-updated">
+							<div class="option-checkbox-text col-xs-11">Tab URL updated</div>
+				    	</div>
+				    	<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-activated">
+							<div class="option-checkbox-text col-xs-11">Tab selected</div>
+				    	</div>
 				    </div>
+				</div>
+				<hr>
+				<!-- save -->
+				<div class="save row">
 				    <!-- status -->
-					<div id="status"></div>
-					<!-- save -->
-					<button id="save" type="button" class="btn btn-default">Save</button>
+					<div class="col-xs-1">
+						<button id="save" type="button" class="btn btn-default">Save</button>
+					</div>
+					<div id="status" class="save-status col-xs-11"></div>
 				</div>
 			</form>
 		</div>
