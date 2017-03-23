@@ -55,3 +55,7 @@ function reloadBackgroundPage() {
 		chrome.runtime.getBackgroundPage(bgPage => resolve(bgPage.location.reload()));
 	});
 }
+
+function ignoreRejection(...args) {
+	return Promise.resolve();
+}
