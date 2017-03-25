@@ -1,13 +1,13 @@
 function saveOptions() {
-	let cahcePeriodInput = document.getElementById('cache-period').value;
-	let cahcePeriod = Math.max(0, Math.min(60 * 24, cahcePeriodInput));
+	let cachePeriodInput = document.getElementById('cache-period').value;
+	let cachePeriod = Math.max(0, Math.min(60 * 24, cachePeriodInput));
 
 	let options = {
 		autorun: {
 			updated: document.getElementById('autorun-updated').checked,
 			activated: document.getElementById('autorun-activated').checked
 		},
-		cache: { period: cahcePeriod },
+		cache: { period: cachePeriod },
 		popup: {
 			newtab: document.getElementById('popup-newtab').checked,
 			newtabInBg: document.getElementById('popup-newtab-bg').checked
