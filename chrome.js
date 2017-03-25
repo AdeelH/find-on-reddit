@@ -47,12 +47,12 @@ function cache(data) {
 
 const DEFAULT_CACHE_PERIOD_MINS = 30;
 function checkCacheValidity(data) {
-	if (!(data && data.time)) {
+	if (!(data && data.time && data.posts)) {
 		return Promise.resolve(false);
 	}
 	let diff = Date.now() - data.time;
-	let query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
-	return getOptions(query).then(cahce => diff < +(cache.period) * 60e3);
+	let query = { options: { cache: { period: DEFAULT_CACHE_PERIOD_MINS } } };
+	return getOptions(query).then(opts => diff < +(opts.cache.period) * 60e3);
 }
 
 function updateOptions(data) {

@@ -12,9 +12,12 @@ function search(query, useCache = true) {
 	if (!useCache) {
 		return makeApiRequest(requestUrl);
 	}
-	return searchCache(query)
-		.then(cache => checkCacheValidity(cache[query]))
-		.then(isValid => isValid ? data.posts : makeApiRequest(requestUrl));
+	return searchCache(query).then(cache => {
+		let data = cache[query];
+		return checkCacheValidity(data).then(isValid =>
+			isValid ? data.posts : makeApiRequest(requestUrl)
+		);
+	});
 }
 
 function cachePosts(query, posts) {
@@ -27,6 +30,7 @@ function cachePosts(query, posts) {
 }
 
 function makeApiRequest(url) {
+	console.log('cache miss');
 	return new Promise((resolve, reject) => {
 		$.get(url).done(resolve).fail(reject);
 	});
