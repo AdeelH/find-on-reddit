@@ -1,10 +1,12 @@
-const baseUrl = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
+const baseUrl = 'https://www.reddit.com/api/info.json?url=';
 
 function findOnReddit(url, useCache = true) {
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache);
 	results.then(res => cachePosts(query, res)).catch(ignoreRejection);
-	return results.then(res => res.data.children);
+	return results
+		.then(res => res.data.children)
+		.then(posts => posts.sort((p1, p2) => p2.data.score - p1.data.score));
 }
 
 function search(query, useCache = true) {
@@ -30,7 +32,6 @@ function cachePosts(query, posts) {
 }
 
 function makeApiRequest(url) {
-	console.log('cache miss');
 	return new Promise((resolve, reject) => {
 		$.get(url).done(resolve).fail(reject);
 	});

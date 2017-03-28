@@ -4,6 +4,7 @@ function processUrl(url, ignoreQueryString = true) {
 		return extractSearchableVideoId(url);
 	}
 	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
+	urlToSearch = /^(?:https?:\/\/)?(?:www|m)?(.*)/i.exec(urlToSearch)[1];
 	return urlToSearch;
 }
 
