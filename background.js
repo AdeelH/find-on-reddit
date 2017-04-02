@@ -2,29 +2,26 @@ const BADGE_COLORS = {
 	error: '#DD1616',
 	success: '#717171'
 };
+let searchOpts;
 
 (function init() {
 	// Avoid storage bloat. Ideally, this should happen on browser exit, 
 	// but the Chrome API doesn't provide an event for that
 	clearCache();
-
-	let query = { 
-		autorun: {
-			updated: true,
-			activated: true
-		}
-	};
-	getOptions(query).then(registerHandlers);
+	getOptions(bgOptions).then(opts => {
+		searchOpts = opts.search;
+		registerHandlers(opts);
+	});
 })();
 
-function registerHandlers(options) {
-	if (options.autorun.updated) {
+function registerHandlers(opts) {
+	if (opts.autorun.updated) {
 		chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
 			autoFind(tabId, tab.url);
 		});
 	}
 
-	if (options.autorun.activated) {
+	if (opts.autorun.activated) {
 		chrome.tabs.onActivated.addListener(activeInfo => {
 			let tabId = activeInfo.tabId;
 			getTabById(tabId).then(tab => autoFind(tabId, tab.url));
@@ -34,7 +31,8 @@ function registerHandlers(options) {
 
 function autoFind(tabId, url) {
 	if (isAllowed(url)) {
-		return findOnReddit(processUrl(url))
+		let urlToSearch = processUrl(url, searchOpts.ignoreQs, searchOpts.ytHandling);
+		return findOnReddit(urlToSearch)
 			.then(posts => setResultsBadge(tabId, `${posts.length}`))
 			.catch(e => handleError(e, tabId));
 	}

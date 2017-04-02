@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<!-- scripts -->
+	    <script src="js/jquery.min.js"></script>
 		<!-- styles -->
 	    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 	    <link rel="stylesheet" type="text/css" href="css/options.css">
@@ -13,6 +15,30 @@
 			<hr>
 			<!-- form -->
 			<form class="form">
+				<!-- search -->
+				<h3 class="option-section-heading">Search Defaults</h3>
+				<div class="form-group container">
+				    <div class="container input-group">
+				    	<!-- exact match -->
+				    	<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="exact">
+							<div class="option-checkbox-text col-xs-11">Exact match</div><br/><br/>
+							<p><i>Note 1: If checked, xyz.com will <u>not</u> match xyz.com/abc, xyz.com/abc/def etc.</i></p>
+							<p><i>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</i></p>
+				    	</div>
+				    	<!-- ignore query-string -->
+				    	<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="ignore-qs">
+							<div class="option-checkbox-text col-xs-11">Ignore query-string</div>
+				    	</div>
+				    	<!-- yt handling -->
+				    	<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="yt">
+							<div class="option-checkbox-text col-xs-11">Special handling of YouTUbe video links</div>
+				    	</div>
+				    </div>
+				</div>
+				<hr>
 				<!-- autorun -->
 				<h3 class="option-section-heading">Auto-search</h3>
 				<div class="form-group container">
@@ -77,6 +103,7 @@
 		</div>
 		<!-- scripts -->
 	    <script src="chrome.js"></script>
+	    <script src="query.js"></script>
 	    <script src="options.js"></script>
 	</body>
 </html>

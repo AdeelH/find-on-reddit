@@ -20,24 +20,34 @@ function search(query, useCache = true, exact = true) {
 	}
 	return searchCache(query).then(cache => {
 		let data = cache[query];
-		return checkCacheValidity(data).then(isValid =>
-			isValid ? data.posts : makeApiRequest(requestUrl)
-		);
+		return checkCacheValidity(data, exact).then(isValid =>
+			isValid ? data.posts : makeApiRequest(requestUrl));
 	});
 }
 
-function cachePosts(query, posts) {
+function makeApiRequest(url) {
+	return new Promise((resolve, reject) => {
+		$.get(url).done(resolve).fail(reject);
+	});
+}
+
+function cachePosts(query, posts, exact) {
 	let objectToStore = {};
 	objectToStore[query] = {
 		posts: posts,
-		time: Date.now()
+		time: Date.now(),
+		exact: exact
 	};
 	return cache(objectToStore);
 }
 
-function makeApiRequest(url) {
-	console.log('cache miss');
-	return new Promise((resolve, reject) => {
-		$.get(url).done(resolve).fail(reject);
-	});
+const DEFAULT_CACHE_PERIOD_MINS = 30;
+function checkCacheValidity(data, exact) {
+	let rightStructure = data && data.time && data.posts && data.exact;
+	if (!(rightStructure && data.exact === exact)) {
+		return Promise.resolve(false);
+	}
+	let diff = Date.now() - data.time;
+	let query = { options: { cache: { period: DEFAULT_CACHE_PERIOD_MINS } } };
+	return getOptions(query).then(opts => diff < +(opts.cache.period) * 60e3);
 }
