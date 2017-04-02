@@ -45,16 +45,6 @@ function cache(data) {
 	});
 }
 
-const DEFAULT_CACHE_PERIOD_MINS = 30;
-function checkCacheValidity(data) {
-	if (!(data && data.time && data.posts)) {
-		return Promise.resolve(false);
-	}
-	let diff = Date.now() - data.time;
-	let query = { options: { cache: { period: DEFAULT_CACHE_PERIOD_MINS } } };
-	return getOptions(query).then(opts => diff < +(opts.cache.period) * 60e3);
-}
-
 function updateOptions(data) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.sync.set({ options: data }, resolve);

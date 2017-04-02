@@ -1,19 +1,19 @@
 
-function processUrl(url, ignoreQueryString = true) {
-	if (isYoutubeUrl(url)) {
+function processUrl(url, ignoreQueryString = true, isYt = false) {
+	if (isYt) {
 		return extractSearchableVideoId(url);
 	}
-	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
-	urlToSearch = /^(?:https?:\/\/)?(?:www\.|m\.)?(.*)/i.exec(urlToSearch)[1];
-	return urlToSearch;
+	let urlStripped = /^https?:\/\/(?:www\.|m\.|)?(.+)/i.exec(url)[1];
+	return ignoreQueryString ? removeQueryString(urlStripped) : urlStripped;
 }
 
 function removeQueryString(url) {
-	return url.split(/[?#]/)[0];
+	return url.split(/[?#]/i)[0];
 }
 
 /* Youtube video handling */
-const YT_REGEX = /https?:\/\/(?:www\.|m\.|)youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/;
+const YT_REGEX = /^https?:\/\/(?:www\.|m\.|)?youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/i;
+const DASHES_REGEX = /^-*(.*)/i;
 
 function isYoutubeUrl(url) {
 	return YT_REGEX.test(url);
@@ -21,11 +21,10 @@ function isYoutubeUrl(url) {
 
 function extractSearchableVideoId(ytUrl) {
 	let videoId = getYoutubeVideoId(ytUrl);
-	let videoIdWithoutLeadingDashes = /^-*(.*)/.exec(videoId)[1];
+	let videoIdWithoutLeadingDashes = DASHES_REGEX.exec(videoId)[1];
 	return videoIdWithoutLeadingDashes;
 }
 
 function getYoutubeVideoId(url) {
-	let match = YT_REGEX.exec(url);
-	return match[1];
+	return YT_REGEX.exec(url)[1];
 }

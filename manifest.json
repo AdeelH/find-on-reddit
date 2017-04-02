@@ -25,6 +25,7 @@
         "chrome.js",
         "url.js",
         "reddit.js",
+        "query.js",
         "background.js"
       ],
       "persistent": false
