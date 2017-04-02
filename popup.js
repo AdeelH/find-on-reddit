@@ -35,6 +35,15 @@ function registerHandlers(opts) {
 		}
 	});
 
+	DOM.opts.ytCheckbox.change(function(e) { 
+		if (this.checked) {
+			setUiState('YT_VID');
+		} else {
+			setUiState('DEFAULT');
+			DOM.ytChoice.removeClass('hidden');
+		}
+	});
+
 	DOM.searchBtn.click(() => render(true));
 }
 
@@ -47,8 +56,10 @@ function render(userClicked = false) {
 	urlPromise.then(updateUiBasedOnUrl);
 	urlPromise
 		.then(url => {
-			let urlToSearch = processUrl(url, params.ignoreQs, params.ytHandling);
-			return findOnReddit(urlToSearch, useCache, params.exactMatch);
+			let isYt = isYoutubeUrl(url) && params.ytHandling;
+			let urlToSearch = processUrl(url, params.ignoreQs, isYt);
+			let exactMatch = params.exactMatch && !isYt;
+			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
 		.then(displayPosts)
 		.then(() => setUiState('SEARCH_END'))
@@ -141,11 +152,15 @@ function setUiState(state, params = null) {
 			DOM.statusDiv.text(`${params.msg}, retrying in 3s ...`); break;
 		case 'YT_VID': 
 			DOM.qsChoice.addClass('hidden');
+			DOM.exactChoice.addClass('hidden');
 			DOM.ytChoice.removeClass('hidden');
-			DOM.ytVidId.text(`'${params.id}'`);
+			if (params && params.id) {
+				DOM.ytVidId.text(`'${params.id}'`);
+			}
 			break;
 		default:
 			DOM.ytChoice.addClass('hidden');
+			DOM.exactChoice.removeClass('hidden');
 			DOM.qsChoice.removeClass('hidden');
 	}
 }
@@ -168,6 +183,7 @@ function fetchDomHandles() {
 		ytChoice: $('#yt-choice'),
 		ytVidId: $('#yt-vid-id'),
 		qsChoice: $('#qs-choice'),
+		exactChoice: $('#exact-choice'),
 		opts: {
 			exactCheckbox: $('#exact'),
 			qsCheckbox: $('#ignore-qs'),

@@ -1,9 +1,10 @@
 
-function processUrl(url, ignoreQueryString = true, ytHandling = true) {
-	if (isYoutubeUrl(url) && ytHandling) {
+function processUrl(url, ignoreQueryString = true, isYt = false) {
+	if (isYt) {
 		return extractSearchableVideoId(url);
 	}
-	return ignoreQueryString ? removeQueryString(url) : url;
+	let urlStripped = /^https?:\/\/(?:www\.|m\.|)?(.+)/i.exec(url)[1];
+	return ignoreQueryString ? removeQueryString(urlStripped) : urlStripped;
 }
 
 function removeQueryString(url) {
@@ -11,7 +12,7 @@ function removeQueryString(url) {
 }
 
 /* Youtube video handling */
-const YT_REGEX = /https?:\/\/(?:www\.|m\.|)youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/i;
+const YT_REGEX = /^https?:\/\/(?:www\.|m\.|)?youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/i;
 const DASHES_REGEX = /^-*(.*)/i;
 
 function isYoutubeUrl(url) {

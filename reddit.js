@@ -4,7 +4,7 @@ const INFO_API = 'https://reddit.com/api/info.json?url=';
 function findOnReddit(url, useCache = true, exact = true) {
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache, exact);
-	results.then(res => cachePosts(query, res)).catch(ignoreRejection);
+	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
 	results = results.then(res => res.data.children);
 	if (exact) {
 		return results
@@ -20,12 +20,14 @@ function search(query, useCache = true, exact = true) {
 	}
 	return searchCache(query).then(cache => {
 		let data = cache[query];
-		return checkCacheValidity(data, exact).then(isValid =>
-			isValid ? data.posts : makeApiRequest(requestUrl));
+		return checkCacheValidity(data, exact).then(isValid => 
+			isValid ? data.posts : makeApiRequest(requestUrl)
+		);
 	});
 }
 
 function makeApiRequest(url) {
+	console.log('cache miss');
 	return new Promise((resolve, reject) => {
 		$.get(url).done(resolve).fail(reject);
 	});
@@ -43,7 +45,7 @@ function cachePosts(query, posts, exact) {
 
 const DEFAULT_CACHE_PERIOD_MINS = 30;
 function checkCacheValidity(data, exact) {
-	let rightStructure = data && data.time && data.posts && data.exact;
+	let rightStructure = data && data.time && data.posts && data.hasOwnProperty('exact');
 	if (!(rightStructure && data.exact === exact)) {
 		return Promise.resolve(false);
 	}

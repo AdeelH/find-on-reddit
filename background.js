@@ -31,8 +31,10 @@ function registerHandlers(opts) {
 
 function autoFind(tabId, url) {
 	if (isAllowed(url)) {
-		let urlToSearch = processUrl(url, searchOpts.ignoreQs, searchOpts.ytHandling);
-		return findOnReddit(urlToSearch)
+		let isYt = isYoutubeUrl(url) && searchOpts.ytHandling;
+		let urlToSearch = processUrl(url, searchOpts.ignoreQs, isYt);
+		let exactMatch = searchOpts.exactMatch && !isYt;
+		return findOnReddit(urlToSearch, true, exactMatch)
 			.then(posts => setResultsBadge(tabId, `${posts.length}`))
 			.catch(e => handleError(e, tabId));
 	}
