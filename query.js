@@ -1,5 +1,4 @@
 /* search queries for retrieving user settings from chrome storage */
-
 const popupUi = {
 	newab: true,
 	newtabInBg: true
@@ -26,6 +25,7 @@ const bgOptions = {
 	search: searchParams
 };
 
+const DEFAULT_CACHE_PERIOD_MINS = 30;
 const allOptions = {
 	autorun: autorun,
 	cache: { period: DEFAULT_CACHE_PERIOD_MINS },

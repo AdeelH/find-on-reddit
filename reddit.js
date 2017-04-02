@@ -43,7 +43,6 @@ function cachePosts(query, posts, exact) {
 	return cache(objectToStore);
 }
 
-const DEFAULT_CACHE_PERIOD_MINS = 30;
 function checkCacheValidity(data, exact) {
 	let rightStructure = data && data.time && data.posts && data.hasOwnProperty('exact');
 	if (!(rightStructure && data.exact === exact)) {
