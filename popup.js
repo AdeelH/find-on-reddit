@@ -14,6 +14,7 @@ function init() {
 		ytVidId: $('#yt-vid-id'),
 		qsChoice: $('#qs-choice'),
 		qsCheckbox: $('#ignore-qs'),
+		exactCheckbox: $('#exact')
 	};
 
 	let query = {
@@ -63,17 +64,26 @@ function registerHandlers(opts) {
 function render(userClicked = false) {
 	setUIState('SEARCH_BEGIN');
 	let urlPromise = getUrl();
-	let ignoreQueryString = dom.qsCheckbox.prop('checked');
+	let params = getSearchParams();
+	let useCache = !userClicked;
 
 	urlPromise.then(updateUiBasedOnUrl);
 	urlPromise
 		.then(url => {
-			let urlToSearch = processUrl(url, ignoreQueryString);
-			return findOnReddit(urlToSearch, !userClicked);
+			let urlToSearch = processUrl(url, params.ignoreQs);
+			return findOnReddit(urlToSearch, useCache, params.exactMatch);
 		})
 		.then(displayPosts)
 		.then(() => setUIState('SEARCH_END'))
 		.catch(onRequestError);
+}
+
+function getSearchParams() {
+	return {
+		ignoreQs: dom.qsCheckbox.prop('checked'),
+		exactMatch: dom.exactCheckbox.prop('checked'),
+		yt: dom.ytCheckbox.prop('checked')
+	};
 }
 
 function getUrl() {
