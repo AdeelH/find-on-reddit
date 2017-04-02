@@ -70,7 +70,7 @@ function render(userClicked = false) {
 	urlPromise.then(updateUiBasedOnUrl);
 	urlPromise
 		.then(url => {
-			let urlToSearch = processUrl(url, params.ignoreQs);
+			let urlToSearch = processUrl(url, params.ignoreQs, params.ytHandling);
 			return findOnReddit(urlToSearch, useCache, params.exactMatch);
 		})
 		.then(displayPosts)
@@ -82,7 +82,7 @@ function getSearchParams() {
 	return {
 		ignoreQs: dom.qsCheckbox.prop('checked'),
 		exactMatch: dom.exactCheckbox.prop('checked'),
-		yt: dom.ytCheckbox.prop('checked')
+		ytHandling: dom.ytCheckbox.prop('checked')
 	};
 }
 
