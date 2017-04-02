@@ -1,6 +1,6 @@
 
-function processUrl(url, ignoreQueryString = true) {
-	if (isYoutubeUrl(url)) {
+function processUrl(url, ignoreQueryString = true, ytHandling = true) {
+	if (isYoutubeUrl(url) && ytHandling) {
 		return extractSearchableVideoId(url);
 	}
 	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
