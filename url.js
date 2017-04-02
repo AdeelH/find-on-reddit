@@ -3,8 +3,7 @@ function processUrl(url, ignoreQueryString = true, ytHandling = true) {
 	if (isYoutubeUrl(url) && ytHandling) {
 		return extractSearchableVideoId(url);
 	}
-	let urlToSearch = ignoreQueryString ? removeQueryString(url) : url;
-	return urlToSearch;
+	return ignoreQueryString ? removeQueryString(url) : url;
 }
 
 function removeQueryString(url) {
@@ -26,6 +25,5 @@ function extractSearchableVideoId(ytUrl) {
 }
 
 function getYoutubeVideoId(url) {
-	let match = YT_REGEX.exec(url);
-	return match[1];
+	return YT_REGEX.exec(url)[1];
 }
