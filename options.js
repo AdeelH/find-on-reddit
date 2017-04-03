@@ -21,7 +21,9 @@ function saveOptions() {
 		},
 		autorun: {
 			updated: DOM.opts.updated.prop('checked'),
-			activated: DOM.opts.activated.prop('checked')
+			activated: DOM.opts.activated.prop('checked'),
+			retryExact: DOM.opts.retryExact.prop('checked'),
+			retryError: DOM.opts.retryError.prop('checked')
 		},
 		popup: {
 			newtab: DOM.opts.newtab.prop('checked'),
@@ -53,10 +55,15 @@ function restoreOptions() {
 		DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
 		DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
 		DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
+
 		DOM.opts.updated.prop('checked', opts.autorun.updated);
 		DOM.opts.activated.prop('checked', opts.autorun.activated);
+		DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
+		DOM.opts.retryError.prop('checked', opts.autorun.retryError);
+
 		DOM.opts.newtab.prop('checked', opts.popup.newtab);
 		DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
+
 		DOM.opts.cachePeriod.val(opts.cache.period);
 	});
 }
@@ -71,6 +78,8 @@ function fetchDomHandles() {
 			ytHandling: $('#yt'),
 			updated: $('#autorun-updated'),
 			activated: $('#autorun-activated'),
+			retryExact: $('#auto-retry-error'),
+			retryError: $('#auto-retry-exact'),
 			newtab: $('#popup-newtab'),
 			newtabInBg: $('#popup-newtab-bg'),
 			cachePeriod: $('#cache-period')

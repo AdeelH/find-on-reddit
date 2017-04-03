@@ -17,7 +17,9 @@ const popupDefaults = {
 
 const autorun = {
 	updated: true,
-	activated: true
+	activated: true,
+	retryExact: true,
+	retryError: true
 };
 
 const bgOptions = {

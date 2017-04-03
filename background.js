@@ -2,26 +2,26 @@ const BADGE_COLORS = {
 	error: '#DD1616',
 	success: '#717171'
 };
-let searchOpts;
+let bgOpts;
 
 (function init() {
 	// Avoid storage bloat. Ideally, this should happen on browser exit, 
 	// but the Chrome API doesn't provide an event for that
 	clearCache();
 	getOptions(bgOptions).then(opts => {
-		searchOpts = opts.search;
-		registerHandlers(opts);
+		bgOpts = opts;
+		registerHandlers();
 	});
 })();
 
-function registerHandlers(opts) {
-	if (opts.autorun.updated) {
+function registerHandlers() {
+	if (bgOpts.autorun.updated) {
 		chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
 			autoFind(tabId, tab.url);
 		});
 	}
 
-	if (opts.autorun.activated) {
+	if (bgOpts.autorun.activated) {
 		chrome.tabs.onActivated.addListener(activeInfo => {
 			let tabId = activeInfo.tabId;
 			getTabById(tabId).then(tab => autoFind(tabId, tab.url));
@@ -30,14 +30,42 @@ function registerHandlers(opts) {
 }
 
 function autoFind(tabId, url) {
-	if (isAllowed(url)) {
-		let isYt = isYoutubeUrl(url) && searchOpts.ytHandling;
-		let urlToSearch = processUrl(url, searchOpts.ignoreQs, isYt);
-		let exactMatch = searchOpts.exactMatch && !isYt;
-		return findOnReddit(urlToSearch, true, exactMatch)
-			.then(posts => setResultsBadge(tabId, `${posts.length}`))
-			.catch(e => handleError(e, tabId));
+	if (!isAllowed(url)) {
+		return;
 	}
+	let isYt = isYoutubeUrl(url) && bgOpts.search.ytHandling;
+	let exactMatch = bgOpts.search.exactMatch && !isYt;
+	let urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
+
+	if (exactMatch) {
+		searchExact(tabId, urlToSearch);
+	} else {
+		searchNonExact(tabId, urlToSearch);
+	}
+}
+
+function searchExact(tabId, url) {
+	findOnReddit(url, true, true)
+		.then(posts => {
+			if (bgOpts.autorun.retryExact && posts.length === 0) {
+				searchNonExact(tabId, url);
+			} else {
+				setResultsBadge(tabId, `${posts.length}`);
+			}
+		})
+		.catch(e => handleError(e, tabId));
+}
+
+const BG_RETRY_INTERVAL = 5e3;
+function searchNonExact(tabId, url) {
+	findOnReddit(url, true, false)
+		.then(posts => setResultsBadge(tabId, `${posts.length}`))
+		.catch(e => {
+			if (bgOpts.autorun.retryError) {
+				setTimeout(() => searchNonExact(tabId, url), BG_RETRY_INTERVAL);
+			}
+			handleError(e, tabId);
+		});
 }
 
 function isAllowed(url) {
