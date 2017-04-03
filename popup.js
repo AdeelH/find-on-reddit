@@ -158,6 +158,7 @@ function setUiState(state, params = null) {
 			DOM.qsChoice.addClass('hidden');
 			DOM.exactChoice.addClass('hidden');
 			DOM.ytChoice.removeClass('hidden');
+			DOM.opts.qsCheckbox.prop('checked', false);
 			if (params && params.id) {
 				DOM.ytVidId.text(`'${params.id}'`);
 			}
