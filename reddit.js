@@ -19,9 +19,10 @@ function search(query, useCache = true, exact = true) {
 		return makeApiRequest(requestUrl);
 	}
 	return searchCache(query).then(cache => {
+		let key = exact ? 'exact' : 'nonExact';
 		let data = cache[query];
-		return checkCacheValidity(data, exact).then(isValid => 
-			isValid ? data.posts : makeApiRequest(requestUrl)
+		return checkCacheValidity(data, key).then(isValid =>
+			isValid ? data[key].posts : makeApiRequest(requestUrl)
 		);
 	});
 }
@@ -34,18 +35,25 @@ function makeApiRequest(url) {
 }
 
 function cachePosts(query, posts, exact) {
-	let objectToStore = {};
-	objectToStore[query] = {
-		posts: posts,
-		time: Date.now(),
-		exact: exact
-	};
-	return cache(objectToStore);
+	let key = exact ? 'exact' : 'nonExact';
+	searchCache(query).then(c => {
+		let objectToStore = {};
+		let data = c[query] || {};
+		data[key] = {
+			posts: posts,
+			time: Date.now()
+		};
+		objectToStore[query] = data;
+		return cache(objectToStore);
+	});
 }
 
-function checkCacheValidity(data, exact) {
-	let rightStructure = data && data.time && data.posts && data.hasOwnProperty('exact');
-	if (!(rightStructure && data.exact === exact)) {
+function checkCacheValidity(cache, key) {
+	if (!(cache && cache.hasOwnProperty(key))) {
+		return Promise.resolve(false);
+	}
+	let data = cache[key];
+	if (!(data.time && data.posts)) {
 		return Promise.resolve(false);
 	}
 	let diff = Date.now() - data.time;
