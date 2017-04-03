@@ -17,7 +17,8 @@ let bgOpts;
 function registerHandlers() {
 	if (bgOpts.autorun.updated) {
 		chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-			autoFind(tabId, tab.url);
+			removeBadge(tabId)
+				.then(() => autoFind(tabId, tab.url));
 		});
 	}
 
@@ -98,6 +99,10 @@ function setErrorBadge(tabId) {
 
 function setResultsBadge(tabId, text) {
 	return setBadge(tabId, text, BADGE_COLORS.success);
+}
+
+function removeBadge(tabId) {
+	return setResultsBadge(tabId, '');
 }
 
 function setBadge(tabId, text, color) {
