@@ -42,7 +42,10 @@ function registerHandlers(opts) {
 			setUiState('DEFAULT');
 			DOM.ytChoice.removeClass('hidden');
 		}
+		render();
 	});
+	DOM.opts.exactCheckbox.change(() => render());
+	DOM.opts.qsCheckbox.change(() => render());
 
 	DOM.searchBtn.click(() => render(true));
 }
@@ -53,12 +56,13 @@ function render(userClicked = false) {
 	let params = getSearchParams();
 	let useCache = !userClicked;
 
-	urlPromise.then(updateUiBasedOnUrl);
+	urlPromise.then(url => updateUiBasedOnUrl(url, params));
 	urlPromise
 		.then(url => {
 			let isYt = isYoutubeUrl(url) && params.ytHandling;
-			let urlToSearch = processUrl(url, params.ignoreQs, isYt);
 			let exactMatch = params.exactMatch && !isYt;
+			let urlToSearch = processUrl(url, params.ignoreQs, isYt);
+
 			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
 		.then(displayPosts)
@@ -165,9 +169,11 @@ function setUiState(state, params = null) {
 	}
 }
 
-function updateUiBasedOnUrl(url) {
+function updateUiBasedOnUrl(url, params) {
 	if (isYoutubeUrl(url)) {
-		setUiState('YT_VID', {id: getYoutubeVideoId(url)});
+		if (params.ytHandling) {
+			setUiState('YT_VID', {id: getYoutubeVideoId(url)});
+		}
 	}
 	else {
 		setUiState('DEFAULT');
