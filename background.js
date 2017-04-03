@@ -45,8 +45,11 @@ function autoFind(tabId, url) {
 }
 
 const BG_RETRY_INTERVAL = 5e3;
-
-function searchExact(tabId, url) {
+const MAX_RETRIES = 5;
+function searchExact(tabId, url, retryCount = 0) {
+	if (retryCount >= MAX_RETRIES) {
+		return;
+	}
 	findOnReddit(url, true, true)
 		.then(posts => {
 			if (bgOpts.autorun.retryExact && posts.length === 0) {
@@ -57,18 +60,21 @@ function searchExact(tabId, url) {
 		})
 		.catch(e => {
 			if (bgOpts.autorun.retryError) {
-				setTimeout(() => searchExact(tabId, url), BG_RETRY_INTERVAL);
+				setTimeout(() => searchExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
 			}
 			handleError(e, tabId);
 		});
 }
 
-function searchNonExact(tabId, url) {
+function searchNonExact(tabId, url, retryCount = 0) {
+	if (retryCount >= MAX_RETRIES) {
+		return;
+	}
 	findOnReddit(url, true, false)
 		.then(posts => setResultsBadge(tabId, `${posts.length}`))
 		.catch(e => {
 			if (bgOpts.autorun.retryError) {
-				setTimeout(() => searchNonExact(tabId, url), BG_RETRY_INTERVAL);
+				setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
 			}
 			handleError(e, tabId);
 		});
