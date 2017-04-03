@@ -44,6 +44,8 @@ function autoFind(tabId, url) {
 	}
 }
 
+const BG_RETRY_INTERVAL = 5e3;
+
 function searchExact(tabId, url) {
 	findOnReddit(url, true, true)
 		.then(posts => {
@@ -53,10 +55,14 @@ function searchExact(tabId, url) {
 				setResultsBadge(tabId, `${posts.length}`);
 			}
 		})
-		.catch(e => handleError(e, tabId));
+		.catch(e => {
+			if (bgOpts.autorun.retryError) {
+				setTimeout(() => searchExact(tabId, url), BG_RETRY_INTERVAL);
+			}
+			handleError(e, tabId);
+		});
 }
 
-const BG_RETRY_INTERVAL = 5e3;
 function searchNonExact(tabId, url) {
 	findOnReddit(url, true, false)
 		.then(posts => setResultsBadge(tabId, `${posts.length}`))
