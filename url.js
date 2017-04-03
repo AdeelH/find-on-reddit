@@ -3,8 +3,7 @@ function processUrl(url, ignoreQueryString = true, isYt = false) {
 	if (isYt) {
 		return extractSearchableVideoId(url);
 	}
-	let urlStripped = /^https?:\/\/(?:www\.|m\.|)?(.+)/i.exec(url)[1];
-	return ignoreQueryString ? removeQueryString(urlStripped) : urlStripped;
+	return ignoreQueryString ? removeQueryString(url) : url;
 }
 
 function removeQueryString(url) {
