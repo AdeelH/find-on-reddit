@@ -10,9 +10,6 @@ function init() {
 
 const CACHE_MAX = 60 * 24;
 function saveOptions() {
-	let cachePeriodInput = DOM.opts.cachePeriod.val();
-	let cachePeriod = Math.max(0, Math.min(CACHE_MAX, cachePeriodInput));
-
 	let options = {
 		search: {
 			exactMatch: DOM.opts.exactMatch.prop('checked'),
@@ -29,25 +26,14 @@ function saveOptions() {
 			newtab: DOM.opts.newtab.prop('checked'),
 			newtabInBg: DOM.opts.newtabInBg.prop('checked')
 		},
-		cache: { period: cachePeriod }
+		cache: { period: getCachePeriod() },
+		blacklist: getBlacklist()
 	};
 	updateOptions(options)
 		.then(notifySuccess)
 		.then(reloadBackgroundPage)
 		.then(restoreOptions)
 		.catch(notifyFailure);
-}
-
-const NOTIFICATION_TIMEOUT = 750;
-function notifySuccess() {
-	DOM.status.addClass('success');
-	DOM.status.text('Saved!');
-	setTimeout(() => $('#status').text(''), NOTIFICATION_TIMEOUT);
-}
-
-function notifyFailure() {
-	DOM.status.addClass('failure');
-	DOM.status.text('Error saving options');
 }
 
 function restoreOptions() {
@@ -65,7 +51,17 @@ function restoreOptions() {
 		DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
 
 		DOM.opts.cachePeriod.val(opts.cache.period);
+		DOM.opts.blacklist.val(opts.blacklist.join('\n'));
 	});
+}
+
+function getBlacklist() {
+	return DOM.opts.blacklist.val().split('\n');
+}
+
+function getCachePeriod() {
+	let cachePeriodInput = DOM.opts.cachePeriod.val();
+	return Math.max(0, Math.min(CACHE_MAX, cachePeriodInput));
 }
 
 function fetchDomHandles() {
@@ -82,7 +78,20 @@ function fetchDomHandles() {
 			retryError: $('#auto-retry-exact'),
 			newtab: $('#popup-newtab'),
 			newtabInBg: $('#popup-newtab-bg'),
-			cachePeriod: $('#cache-period')
+			cachePeriod: $('#cache-period'),
+			blacklist: $('#blacklist')
 		}
 	};
+}
+
+const NOTIFICATION_TIMEOUT = 750;
+function notifySuccess() {
+	DOM.status.addClass('success');
+	DOM.status.text('Saved!');
+	setTimeout(() => $('#status').text(''), NOTIFICATION_TIMEOUT);
+}
+
+function notifyFailure(msg = 'Error saving options') {
+	DOM.status.addClass('failure');
+	DOM.status.text(msg);
 }
