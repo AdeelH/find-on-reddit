@@ -24,12 +24,14 @@ const autorun = {
 
 const bgOptions = {
 	autorun: autorun,
-	search: searchParams
+	search: searchParams,
+	blacklist: []
 };
 
 const DEFAULT_CACHE_PERIOD_MINS = 30;
 const allOptions = {
 	autorun: autorun,
+	blacklist: bgOptions.blacklist,
 	cache: { period: DEFAULT_CACHE_PERIOD_MINS },
 	popup: popupUi,
 	search: searchParams

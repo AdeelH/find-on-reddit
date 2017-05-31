@@ -82,7 +82,11 @@ function searchNonExact(tabId, url, retryCount = 0) {
 }
 
 function isAllowed(url) {
-	return !isChromeUrl(url);
+	return !(isChromeUrl(url) || isBlackListed(url));
+}
+
+function isBlackListed(url) {
+	return bgOpts.blacklist.some(s => url.search(s) > -1);
 }
 
 function handleError(e, tabId) {
