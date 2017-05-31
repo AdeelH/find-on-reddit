@@ -55,8 +55,12 @@ function render(userClicked = false) {
 	let urlPromise = getUrl();
 	let params = getSearchParams();
 	let useCache = !userClicked;
+	let originalUrl;
 
-	urlPromise.then(url => updateUiBasedOnUrl(url, params));
+	urlPromise.then(url => {
+		originalUrl = url;
+		updateUiBasedOnUrl(url, params);
+	});
 	urlPromise
 		.then(url => {
 			let isYt = isYoutubeUrl(url) && params.ytHandling;
@@ -65,7 +69,7 @@ function render(userClicked = false) {
 
 			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
-		.then(displayPosts)
+		.then(posts=> displayPosts(posts, originalUrl))
 		.then(() => setUiState('SEARCH_END'))
 		.catch(onRequestError);
 }
@@ -116,7 +120,7 @@ function calcAge(timestampSeconds) {
 }
 
 /* UI */
-function displayPosts(posts) {
+function displayPosts(posts, url = '') {
 	if (!posts) {
 		return;
 	}
@@ -134,7 +138,8 @@ function displayPosts(posts) {
 		// context for Handlebars template
 		context: {
 			numPosts: posts.length,
-			posts: posts
+			posts: posts,
+			url: url
 		}
 	};
 	document.getElementById('tFrame').contentWindow.postMessage(msg, '*');
