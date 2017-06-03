@@ -2,9 +2,9 @@
 <script id="search-results-template" type="text/x-handlebars-template">
   <div class="row num-results-container">
     {{#if numPosts}}
-      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/{{url}}">repost to Reddit</a></span>
+      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/submit?url={{url}}&resubmit=true">repost to Reddit</a></span>
     {{else}}
-      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/{{url}}">post to Reddit</a></span>
+      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/submit?url={{url}}">post to Reddit</a></span>
     {{/if}}
   </div>
   <div class="row container-fluid list-container">
