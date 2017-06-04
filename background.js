@@ -82,6 +82,7 @@ function searchNonExact(tabId, url, retryCount = 0) {
 }
 
 function isAllowed(url) {
+	url = url.toLowerCase();
 	return !(isChromeUrl(url) || isBlackListed(url));
 }
 

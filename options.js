@@ -56,7 +56,7 @@ function restoreOptions() {
 }
 
 function getBlacklist() {
-	return DOM.opts.blacklist.val().split('\n');
+	return DOM.opts.blacklist.val().toLowerCase().split('\n');
 }
 
 function getCachePeriod() {
