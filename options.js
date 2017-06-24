@@ -56,7 +56,10 @@ function restoreOptions() {
 }
 
 function getBlacklist() {
-	return DOM.opts.blacklist.val().toLowerCase().split('\n');
+	return DOM.opts.blacklist.val().toLowerCase()
+		.split('\n')
+		.map(s => s.trim())
+		.filter(s => s.length > 0);
 }
 
 function getCachePeriod() {
