@@ -31,7 +31,7 @@ function registerHandlers() {
 }
 
 function autoFind(tabId, url) {
-	if (!isAllowed(url)) {
+	if (!isAllowed(removeQueryString(url))) {
 		return;
 	}
 	let isYt = isYoutubeUrl(url) && bgOpts.search.ytHandling;
