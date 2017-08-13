@@ -24,7 +24,11 @@ function saveOptions() {
 		},
 		popup: {
 			newtab: DOM.opts.newtab.prop('checked'),
-			newtabInBg: DOM.opts.newtabInBg.prop('checked')
+			newtabInBg: DOM.opts.newtabInBg.prop('checked'),
+			results: {
+				orderBy: DOM.opts.orderBy.val(),
+				desc: DOM.opts.orderDesc.prop('checked')
+			}
 		},
 		cache: { period: getCachePeriod() },
 		blacklist: getBlacklist()
@@ -52,6 +56,9 @@ function restoreOptions() {
 
 		DOM.opts.cachePeriod.val(opts.cache.period);
 		DOM.opts.blacklist.val(opts.blacklist.join('\n'));
+
+		DOM.opts.orderBy.val(opts.popup.results.orderBy);
+		DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
 	});
 }
 
@@ -82,7 +89,9 @@ function fetchDomHandles() {
 			newtab: $('#popup-newtab'),
 			newtabInBg: $('#popup-newtab-bg'),
 			cachePeriod: $('#cache-period'),
-			blacklist: $('#blacklist')
+			blacklist: $('#blacklist'),
+			orderBy: $('#order-by'),
+			orderDesc: $('#order-desc')
 		}
 	};
 }

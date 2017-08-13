@@ -20,8 +20,7 @@ function init() {
 		.then(opts => {
 			registerHandlers(opts.popup);
 			setSearchDefaults(opts.search);
-			state.orderBy = opts.results.orderBy;
-			state.desc = opts.results.desc;
+			state.opts = opts.popup.results;
 		})
 		.then(render);
 }
