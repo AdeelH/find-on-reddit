@@ -56,6 +56,7 @@ function render(userClicked = false) {
 	let params = getSearchParams();
 	let useCache = !userClicked;
 	let originalUrl;
+	let isYt, exactMatch;
 
 	urlPromise.then(url => {
 		originalUrl = url;
@@ -63,14 +64,22 @@ function render(userClicked = false) {
 	});
 	urlPromise
 		.then(url => {
-			let isYt = isYoutubeUrl(url) && params.ytHandling;
-			let exactMatch = params.exactMatch && !isYt;
+			isYt = isYoutubeUrl(url) && params.ytHandling;
+			exactMatch = params.exactMatch && !isYt;
 			let urlToSearch = processUrl(url, params.ignoreQs, isYt);
 
 			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
-		.then(posts=> displayPosts(posts, originalUrl))
-		.then(() => setUiState('SEARCH_END'))
+		.then(posts => {
+			displayPosts(posts, originalUrl);
+			return posts.other;
+		})
+		.then(otherResults => {
+			setUiState('SEARCH_END', {
+				name: (!exactMatch ? 'exact' : 'non-exact'),
+				num: otherResults
+			});
+		})
 		.catch(onRequestError);
 }
 
@@ -153,13 +162,25 @@ function setSearchDefaults(opts) {
 
 function setUiState(state, params = null) {
 	switch(state) {
-		case 'SEARCH_BEGIN':
+		case 'SEARCH_BEGIN': {
 			DOM.statusDiv.text('Searching ...'); break;
-		case 'SEARCH_END':
-			DOM.statusDiv.text(''); break;
-		case 'AJAX_ERROR':
-			DOM.statusDiv.text(`${params.msg}, retrying in 3s ...`); break;
-		case 'YT_VID': 
+		}
+		case 'SEARCH_END': {
+			DOM.statusDiv.text('');
+			if (typeof params.num === 'undefined') {
+				DOM.otherResultsDiv.addClass('hidden');
+			} else {
+				DOM.otherResultsDiv.removeClass('hidden');
+			}
+			DOM.otherResultsNum.text(`${params.name} matches: ${params.num}`);
+			break;
+		}
+		case 'AJAX_ERROR': {
+			params.msg = params.msg || 'error';
+			DOM.statusDiv.text(`${params.msg}, retrying in 3s ...`);
+			break;
+		}
+		case 'YT_VID': {
 			DOM.qsChoice.addClass('hidden');
 			DOM.exactChoice.addClass('hidden');
 			DOM.ytChoice.removeClass('hidden');
@@ -168,10 +189,12 @@ function setUiState(state, params = null) {
 				DOM.ytVidId.text(`'${params.id}'`);
 			}
 			break;
-		default:
+		}
+		default: {
 			DOM.ytChoice.addClass('hidden');
 			DOM.exactChoice.removeClass('hidden');
 			DOM.qsChoice.removeClass('hidden');
+		}
 	}
 }
 
@@ -189,6 +212,8 @@ function updateUiBasedOnUrl(url, params) {
 function fetchDomHandles() {
 	return {
 		resultsDiv: $('#results'),
+		otherResultsDiv: $('#other-results'),
+		otherResultsNum: $('#other-results-num'),
 		statusDiv: $('#status'),
 		urlInput: $('#url'),
 		searchBtn: $('#url-submit'),
