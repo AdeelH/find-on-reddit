@@ -5,7 +5,6 @@ function findOnReddit(url, useCache = true, exact = true) {
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache, exact);
 	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
-	results = results.then(res => res.data.children);
 	if (exact) {
 		return results
 			.then(ps => ps.sort((p, q) => q.data.score - p.data.score));
@@ -16,14 +15,30 @@ function findOnReddit(url, useCache = true, exact = true) {
 function search(query, useCache = true, exact = true) {
 	let requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
 	if (!useCache) {
-		return makeApiRequest(requestUrl);
+		return makeApiRequest(requestUrl).then(res => res.data.children);
 	}
 	return searchCache(query).then(cache => {
+		let data = cache[query] || {};
 		let key = exact ? 'exact' : 'nonExact';
-		let data = cache[query];
-		return checkCacheValidity(data, key).then(isValid =>
-			isValid ? data[key].posts : makeApiRequest(requestUrl)
-		);
+		let otherResults = data[exact ? 'nonExact' : 'exact'];
+		return checkCacheValidity(data, key).then(isValid => {
+			if (isValid) {
+				posts = data[key].posts;
+				if (otherResults) {
+					posts.other = otherResults.posts.length;
+				}
+				return posts;
+			} else {
+				let res = makeApiRequest(requestUrl).then(res => res.data.children);
+				if (otherResults) {
+					res.then(posts => {
+						posts.other = otherResults.posts.length;
+						return posts;
+					});
+				}
+				return res;
+			}
+		});
 	});
 }
 
@@ -49,7 +64,7 @@ function cachePosts(query, posts, exact) {
 }
 
 function checkCacheValidity(cache, key) {
-	if (!(cache && cache.hasOwnProperty(key))) {
+	if (!cache.hasOwnProperty(key)) {
 		return Promise.resolve(false);
 	}
 	let data = cache[key];
