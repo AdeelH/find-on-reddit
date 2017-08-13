@@ -1,7 +1,11 @@
 /* search queries for retrieving user settings from chrome storage */
 const popupUi = {
 	newab: true,
-	newtabInBg: true
+	newtabInBg: true,
+	results: {
+		orderBy: 'score',
+		desc: true
+	}
 };
 
 const searchParams = {

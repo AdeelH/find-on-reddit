@@ -1,5 +1,15 @@
 // DOM handles
 let DOM;
+let state = {
+	lastResult: {
+		posts: [],
+		url: '',
+	},
+	opts: {
+		orderBy: 'score',
+		desc: true
+	}
+};
 
 $(document).ready(init);
 
@@ -10,6 +20,7 @@ function init() {
 		.then(opts => {
 			registerHandlers(opts.popup);
 			setSearchDefaults(opts.search);
+			state.opts = opts.popup.results;
 		})
 		.then(render);
 }
@@ -20,6 +31,15 @@ function registerHandlers(opts) {
 		if (e.data.html) {
 			DOM.resultsDiv.html(e.data.html);
 		}
+		$('.sort-options').change(function() {
+			state.opts.orderBy = $(this).val();
+			displayPosts(state.lastResult.posts, state.lastResult.url);
+		});
+		$('.sort-order').click(e => {
+			e.stopPropagation();
+			state.opts.desc = !state.opts.desc;
+			displayPosts(state.lastResult.posts, state.lastResult.url);
+		});
 	});
 
 	// open links in new tab - or not
@@ -47,6 +67,7 @@ function registerHandlers(opts) {
 	DOM.opts.exactCheckbox.change(() => render());
 	DOM.opts.qsCheckbox.change(() => render());
 
+
 	DOM.searchBtn.click(() => render(true));
 }
 
@@ -71,6 +92,8 @@ function render(userClicked = false) {
 			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
 		.then(posts => {
+			state.lastResult.posts = posts;
+			state.lastResult.url = originalUrl;
 			displayPosts(posts, originalUrl);
 			return posts.other;
 		})
@@ -129,6 +152,25 @@ function calcAge(timestampSeconds) {
 }
 
 /* UI */
+let fieldMappings = Object.freeze({
+	score: 'score',
+	comments: 'num_comments',
+	age: 'created_utc',
+	subreddit: 'subreddit'
+});
+
+function sortPosts(posts, orderBy = 'score', desc = true) {
+	if (orderBy == 'subreddit') {
+		return posts.sort((a, b) => 
+			a.data.subreddit.localeCompare(b.data.subreddit) * (2 * desc - 1)
+		);
+	}
+	let field = fieldMappings[orderBy];
+	let comparator = (a, b) => 
+		(a.data[field] - b.data[field]) * (1 - 2 * desc);
+	return posts.sort(comparator);
+}
+
 function displayPosts(posts, url = '') {
 	if (!posts) {
 		return;
@@ -143,12 +185,14 @@ function displayPosts(posts, url = '') {
 			}
 		});
 	}
+	let sortedPosts = sortPosts(posts, state.opts.orderBy, state.opts.desc);
 	let msg = {
 		// context for Handlebars template
 		context: {
 			numPosts: posts.length,
-			posts: posts,
-			url: url
+			posts: sortedPosts,
+			url: url,
+			orderBy: state.opts.orderBy
 		}
 	};
 	document.getElementById('tFrame').contentWindow.postMessage(msg, '*');
