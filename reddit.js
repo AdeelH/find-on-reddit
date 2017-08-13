@@ -5,10 +5,6 @@ function findOnReddit(url, useCache = true, exact = true) {
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache, exact);
 	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
-	if (exact) {
-		return results
-			.then(ps => ps.sort((p, q) => q.data.score - p.data.score));
-	}
 	return results;
 }
 

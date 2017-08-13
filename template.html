@@ -1,49 +1,78 @@
 <script src="js/handlebars.min.js"></script>
 <script id="search-results-template" type="text/x-handlebars-template">
-  <div class="row num-results-container">
-    {{#if numPosts}}
-      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/submit?url={{url}}&resubmit=true">repost to Reddit</a></span>
-    {{else}}
-      <span id="num-results">{{numPosts}} results | <a href="https://www.reddit.com/submit?url={{url}}">post to Reddit</a></span>
-    {{/if}}
-  </div>
-  <div class="row container-fluid list-container">
-    <table id="list" class="table">
-      {{#each posts}}
-        <tr class="row">
-          <td class="col-md-2 score">
-            {{data.score}}
-          </td>
-          <td class="col-md-8 title">
-              <span>
-                <a href="https://www.reddit.com{{data.permalink}}">
-                  <span class="post-title">{{data.title}}</span>
-                </a>
-                <br/>
-                <a href="https://www.reddit.com{{data.permalink}}">
-                  <span class="num-comments">{{data.num_comments}} comments | </span>
-                </a>
-                <small class="post-details">
-                  submitted {{data.age}} ago by 
-                  <a href="https://www.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
-                </small>
-                <br/>
-              </span>
-          </td>
-          <td class="col-md-2 subreddit">
-            <a href="https://www.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a>
-          </td>
-        </tr>
-      {{/each}}
-    </table>
+  <div class="container-fluid">
+    <div class="row num-results-container">
+      <div class="num-results col-xs-6 text-left">
+        <span>{{numPosts}} results  |  </span>
+        <a href="https://www.reddit.com/submit?url={{url}}
+        {{#if numPosts}}
+          &resubmit=true">repost to Reddit
+        {{else}}
+          ">post to Reddit
+        {{/if}}
+        <span class="glyphicon glyphicon-share-alt"></span></a>
+      </div>
+      <div class="col-xs-6">
+        <span class="pull-right">
+          sort 
+          <select class="sort-options">
+            {{#selected orderBy}}
+              <option class="sort-option" value="score">score</option>
+              <option class="sort-option" value="comments">comments</option>
+              <option class="sort-option" value="age">age</option>
+              <option class="sort-option" value="subreddit">subreddit</option>
+            {{/selected}}
+          </select>
+          <a class="sort-order btn btn-xs btn-link" style="color: #ccc">
+            <span class="glyphicon glyphicon-sort"></span>
+          </a>
+        </span>
+      </div>
+    </div>
+    <div class="row container-fluid list-container">
+      <table id="list" class="table">
+        {{#each posts}}
+          <tr class="row">
+            <td class="col-md-2 score">
+              {{data.score}}
+            </td>
+            <td class="col-md-8 title">
+                <span>
+                  <a href="https://www.reddit.com{{data.permalink}}">
+                    <span class="post-title">{{data.title}}</span>
+                  </a>
+                  <br/>
+                  <a href="https://www.reddit.com{{data.permalink}}">
+                    <span class="num-comments">{{data.num_comments}} comments | </span>
+                  </a>
+                  <small class="post-details">
+                    submitted {{data.age}} ago by 
+                    <a href="https://www.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
+                  </small>
+                  <br/>
+                </span>
+            </td>
+            <td class="col-md-2 subreddit">
+              <a href="https://www.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a>
+            </td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
   </div>
 </script>
 
+<script src="js/jquery.min.js"></script>
 <script>
-  var template = Handlebars.compile(document.getElementById("search-results-template").innerHTML);
-  window.addEventListener('message', function(event) {
-    event.source.postMessage({
-      html: template(event.data.context)
-    }, event.origin);
+  Handlebars.registerHelper('selected', function(val, options) {
+      let div = $('<div>').html(options.fn(this));
+      div.find(`[value=${val}]`).attr('selected', true);
+      return div.html();
+  });
+  var template = Handlebars.compile($('#search-results-template').html());
+  window.addEventListener('message', evt => {
+    evt.source.postMessage({
+      html: template(evt.data.context)
+    }, evt.origin);
   });
 </script>

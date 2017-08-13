@@ -12,7 +12,11 @@ const searchParams = {
 
 const popupDefaults = {
 	popup: popupUi,
-	search: searchParams
+	search: searchParams,
+	results: {
+		orderBy: 'score',
+		desc: true
+	}
 };
 
 const autorun = {
