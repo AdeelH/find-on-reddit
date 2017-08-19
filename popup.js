@@ -234,6 +234,15 @@ function setUiState(state, params = null) {
 			}
 			break;
 		}
+		case 'YT_VID_HANDLING_OFF': {
+			DOM.qsChoice.removeClass('hidden');
+			DOM.exactChoice.removeClass('hidden');
+			DOM.ytChoice.removeClass('hidden');
+			if (params && params.id) {
+				DOM.ytVidId.text(`'${params.id}'`);
+			}
+			break;
+		}
 		default: {
 			DOM.ytChoice.addClass('hidden');
 			DOM.exactChoice.removeClass('hidden');
@@ -244,9 +253,8 @@ function setUiState(state, params = null) {
 
 function updateUiBasedOnUrl(url, params) {
 	if (isYoutubeUrl(url)) {
-		if (params.ytHandling) {
-			setUiState('YT_VID', {id: getYoutubeVideoId(url)});
-		}
+		let state = params.ytHandling ? 'YT_VID' : 'YT_VID_HANDLING_OFF';
+		setUiState(state, { id: getYoutubeVideoId(url) });
 	}
 	else {
 		setUiState('DEFAULT');
