@@ -14,7 +14,12 @@
       </div>
       <div class="col-xs-6">
         <span class="pull-right">
-          sort 
+          <a class="sort-order btn btn-xs btn-link">
+            <span class="glyphicon glyphicon-sort"></span>
+          </a>
+        </span>
+        <span class="pull-right" style="margin-right: 5px;">
+          <span class="pre">sort  </span>
           <select class="sort-options">
             {{#selected orderBy}}
               <option class="sort-option" value="score">score</option>
@@ -23,9 +28,6 @@
               <option class="sort-option" value="subreddit">subreddit</option>
             {{/selected}}
           </select>
-          <a class="sort-order btn btn-xs btn-link" style="color: #ccc">
-            <span class="glyphicon glyphicon-sort"></span>
-          </a>
         </span>
       </div>
     </div>
@@ -44,12 +46,12 @@
                   <br/>
                   <a href="https://www.reddit.com{{data.permalink}}">
                     <span class="num-comments">
-                      {{data.num_comments}} {{#pluralize "comment" data.num_comments}}{{/pluralize}} | 
-                      </span>
-                  </a>
+                      {{data.num_comments}} {{#pluralize "comment" data.num_comments}}{{/pluralize}}
+                    </span>
+                  </a> | 
                   <small class="post-details">
                     submitted {{data.age}} ago by 
-                    <a href="https://www.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
+                    <a class="pop" href="https://www.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
                   </small>
                   <br/>
                 </span>

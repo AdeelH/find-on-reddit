@@ -19,7 +19,7 @@ body
 
 .num-results
 {
-  padding: 2px 0 0 0;
+  padding: 3px 0 0 0;
 }
 
 .list-container
@@ -55,6 +55,17 @@ td.subreddit
   color: #ddd;
 }
 
+.night-mode a:hover
+{
+  color: white;
+  text-decoration: none;
+}
+
+.night-mode a.pop:hover
+{
+  font-size: 1.1em;
+}
+
 .night-mode .post-details
 {
   color: #aaa;
@@ -70,15 +81,30 @@ td.subreddit
 
 .night-mode .btn-default
 {
-  background-color: #444;
+  background-color: #363636;
   border: 1px solid #8c8c8c;
   border-left: none;
-  color: white;
+  color: #dfdfdf;
 }
 
 .night-mode .btn-default:hover
 {
-	background-color: #4f4f4f;
+  background-color: #2f2f2f;
+  color: white;
+}
+
+.night-mode .btn-default:hover:active
+{
+  background-color: #222;
+  border: 1px solid #999;
+  color: white;
+}
+
+.night-mode .btn-default:active
+{
+  background-color: #222;
+  border: 1px solid #999;
+  color: white;
 }
 
 .search-status
@@ -86,19 +112,30 @@ td.subreddit
   text-align: center;
 }
 
-.other-results {
+.night-mode .other-results
+{
   color: #ccc;
 }
 
-.sort-options {
+.night-mode select.sort-options
+{
   background-color: #333;
+  border-radius: 2px;
   color: #ddd;
 }
 
-.sort-option {
+.night-mode option.sort-option:hover,
+.night-mode select.sort-options:hover
+{
+  background-color: #444;
+}
+
+.night-mode .sort-option
+{
   color: #ccc;
 }
 
-.pre {
+.pre
+{
   white-space: pre;
 }
