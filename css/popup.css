@@ -62,15 +62,23 @@ td.subreddit
 
 .night-mode .form-control
 {
-	background-color: #777;
+  background-color: #5c5c5c;
+	border: 1px solid #8c8c8c;
 	color: white;
 	font-size: 15px;
 }
 
 .night-mode .btn-default
 {
-	background-color: #999;
-	color: white;
+  background-color: #444;
+  border: 1px solid #8c8c8c;
+  border-left: none;
+  color: white;
+}
+
+.night-mode .btn-default:hover
+{
+	background-color: #4f4f4f;
 }
 
 .search-status
@@ -84,8 +92,13 @@ td.subreddit
 
 .sort-options {
   background-color: #333;
-  color: #ccc;
+  color: #ddd;
 }
 
 .sort-option {
+  color: #ccc;
+}
+
+.pre {
+  white-space: pre;
 }
