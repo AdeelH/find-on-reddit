@@ -11,6 +11,6 @@ Chrome extension that searches for submissions of the current URL on Reddit.
   - special handling of Youtube video links: search by video ID to match all variations of Youtube links
 
 ## Screenshot
-![screenshot1](./screenshots/xkcd.png)
+![screenshot1](./screenshots/xkcd.PNG)
 
-![screenshot2](./screenshots/youtube.png)
+![screenshot2](./screenshots/youtube.PNG)
