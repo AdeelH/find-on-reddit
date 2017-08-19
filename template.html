@@ -3,7 +3,7 @@
   <div class="container-fluid">
     <div class="row num-results-container">
       <div class="num-results col-xs-6 text-left">
-        <span>{{numPosts}} results  |  </span>
+        <span class="pre">{{numPosts}} {{#pluralize "result" numPosts}}{{/pluralize}}  |  </span>
         <a href="https://www.reddit.com/submit?url={{url}}
         {{#if numPosts}}
           &resubmit=true">repost to Reddit
@@ -43,7 +43,9 @@
                   </a>
                   <br/>
                   <a href="https://www.reddit.com{{data.permalink}}">
-                    <span class="num-comments">{{data.num_comments}} comments | </span>
+                    <span class="num-comments">
+                      {{data.num_comments}} {{#pluralize "comment" data.num_comments}}{{/pluralize}} | 
+                      </span>
                   </a>
                   <small class="post-details">
                     submitted {{data.age}} ago by 
@@ -69,6 +71,11 @@
       div.find(`[value=${val}]`).attr('selected', true);
       return div.html();
   });
+
+  Handlebars.registerHelper('pluralize', function(str, n) {
+    return `${str}${n != 1 ? 's' : ''}`;
+  });
+
   var template = Handlebars.compile($('#search-results-template').html());
   window.addEventListener('message', evt => {
     evt.source.postMessage({
