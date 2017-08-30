@@ -53,12 +53,12 @@ td.subreddit
 .night-mode a
 {
   color: #ddd;
+  text-decoration: none;
 }
 
 .night-mode a:hover
 {
   color: white;
-  text-decoration: none;
 }
 
 .night-mode a.pop:hover
