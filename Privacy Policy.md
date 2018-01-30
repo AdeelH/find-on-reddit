@@ -11,8 +11,8 @@ This includes chrome:// and file:// URLs.
 The URLs accessed are used in the following ways
 - To make an API request to one of
 	- https://api.reddit.com/search.json, or 
-	- https://api.reddit.com/info.json
-  depending on whether exact search or non-exact search is enabled.
+	- https://api.reddit.com/info.json  
+depending on whether exact search or non-exact search is enabled.
 - To store the URL and the corresponding search results locally via Chrome's Storage API, if caching is enabled.
 
 Neither the URLs nor the search results are transmitted or stored anywhere else, or used in any other way.
