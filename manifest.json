@@ -3,7 +3,7 @@
 
   "name": "Find on Reddit",
   "description": "Find discussions of the current URL on Reddit",
-  "version": "1.4.7",
+  "version": "1.4.8",
 
   "browser_action": {
     "default_icon": "icon-256.png",
