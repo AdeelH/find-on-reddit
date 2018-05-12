@@ -11,6 +11,7 @@ function init() {
 const CACHE_MAX = 60 * 24;
 function saveOptions() {
 	let options = {
+		oldReddit: DOM.opts.oldReddit.prop('checked'),
 		search: {
 			exactMatch: DOM.opts.exactMatch.prop('checked'),
 			ignoreQs: DOM.opts.ignoreQs.prop('checked'),
@@ -42,6 +43,9 @@ function saveOptions() {
 
 function restoreOptions() {
 	getOptions(allOptions).then(opts => {
+
+		DOM.opts.oldReddit.prop('checked', opts.oldReddit);
+		
 		DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
 		DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
 		DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
@@ -79,6 +83,7 @@ function fetchDomHandles() {
 		saveButton: $('#save'),
 		status: $('#status'),
 		opts: {
+			oldReddit: $('#old-reddit'),
 			exactMatch: $('#exact'),
 			ignoreQs: $('#ignore-qs'),
 			ytHandling: $('#yt'),

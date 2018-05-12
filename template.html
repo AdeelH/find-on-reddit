@@ -4,7 +4,7 @@
     <div class="row num-results-container">
       <div class="num-results col-xs-6 text-left">
         <span class="pre">{{numPosts}} {{#pluralize "result" numPosts}}{{/pluralize}}  |  </span>
-        <a href="https://www.reddit.com/submit?url={{url}}
+        <a href="https://{{#if oldReddit}}old{{else}}www{{/if}}.reddit.com/submit?url={{url}}
         {{#if numPosts}}
           &resubmit=true">repost to Reddit
         {{else}}
@@ -40,24 +40,24 @@
             </td>
             <td class="col-md-8 title">
                 <span>
-                  <a href="https://www.reddit.com{{data.permalink}}">
+                  <a href="https://{{#if ../oldReddit}}old{{else}}www{{/if}}.reddit.com{{data.permalink}}">
                     <span class="post-title">{{data.title}}</span>
                   </a>
                   <br/>
-                  <a href="https://www.reddit.com{{data.permalink}}">
+                  <a href="https://{{#if ../oldReddit}}old{{else}}www{{/if}}.reddit.com{{data.permalink}}">
                     <span class="num-comments">
                       {{data.num_comments}} {{#pluralize "comment" data.num_comments}}{{/pluralize}}
                     </span>
                   </a> | 
                   <small class="post-details">
                     submitted {{data.age}} ago by 
-                    <a class="pop" href="https://www.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
+                    <a class="pop" href="https://{{#if ../oldReddit}}old{{else}}www{{/if}}.reddit.com/u/{{data.author}}">/u/{{data.author}}</a>
                   </small>
                   <br/>
                 </span>
             </td>
             <td class="col-md-2 subreddit">
-              <a href="https://www.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a>
+              <a href="https://{{#if ../oldReddit}}old{{else}}www{{/if}}.reddit.com/r/{{data.subreddit}}">/r/{{data.subreddit}}</a>
             </td>
           </tr>
         {{/each}}

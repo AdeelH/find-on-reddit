@@ -1,4 +1,6 @@
 /* search queries for retrieving user settings from chrome storage */
+const oldReddit = true;
+
 const popupUi = {
 	newab: true,
 	newtabInBg: true,
@@ -16,7 +18,8 @@ const searchParams = {
 
 const popupDefaults = {
 	popup: popupUi,
-	search: searchParams
+	search: searchParams,
+	oldReddit: oldReddit
 };
 
 const autorun = {
@@ -34,6 +37,7 @@ const bgOptions = {
 
 const DEFAULT_CACHE_PERIOD_MINS = 30;
 const allOptions = {
+	oldReddit: oldReddit,
 	autorun: autorun,
 	blacklist: bgOptions.blacklist,
 	cache: { period: DEFAULT_CACHE_PERIOD_MINS },

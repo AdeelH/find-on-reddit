@@ -7,8 +7,9 @@ let state = {
 	},
 	opts: {
 		orderBy: 'score',
-		desc: true
-	}
+		desc: true,
+	},
+	oldReddit: true
 };
 
 $(document).ready(init);
@@ -21,6 +22,7 @@ function init() {
 			registerHandlers(opts.popup);
 			setSearchDefaults(opts.search);
 			state.opts = opts.popup.results;
+			state.oldReddit = opts.oldReddit;
 		})
 		.then(render);
 }
@@ -189,6 +191,7 @@ function displayPosts(posts, url = '') {
 	let msg = {
 		// context for Handlebars template
 		context: {
+			oldReddit: state.oldReddit,
 			numPosts: posts.length,
 			posts: sortedPosts,
 			url: url,
