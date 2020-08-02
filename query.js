@@ -1,5 +1,5 @@
 /* search queries for retrieving user settings from chrome storage */
-const oldReddit = true;
+const oldReddit = false;
 
 const popupUi = {
 	newab: true,
