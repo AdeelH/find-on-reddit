@@ -1,6 +1,6 @@
 const BADGE_COLORS = {
 	error: '#DD1616',
-	success: '#717171'
+	success: '#555555'
 };
 let bgOpts;
 
