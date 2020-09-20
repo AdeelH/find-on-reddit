@@ -24,7 +24,8 @@ function init() {
 			state.opts = opts.popup.results;
 			state.oldReddit = opts.oldReddit;
 		})
-		.then(render);
+		.then(render)
+		.catch(console.log);
 }
 
 function registerHandlers(opts) {
@@ -66,8 +67,8 @@ function registerHandlers(opts) {
 		}
 		render();
 	});
-	DOM.opts.exactCheckbox.change(() => render());
-	DOM.opts.qsCheckbox.change(() => render());
+	DOM.opts.exactCheckbox.change(render);
+	DOM.opts.qsCheckbox.change(render);
 
 
 	DOM.searchBtn.click(() => render(true));
@@ -81,12 +82,11 @@ function render(userClicked = false) {
 	let originalUrl;
 	let isYt, exactMatch;
 
-	urlPromise.then(url => {
-		originalUrl = url;
-		updateUiBasedOnUrl(url, params);
-	});
 	urlPromise
 		.then(url => {
+			originalUrl = url;
+			updateUiBasedOnUrl(url, params);
+
 			isYt = isYoutubeUrl(url) && params.ytHandling;
 			exactMatch = params.exactMatch && !isYt;
 			let urlToSearch = processUrl(url, params.ignoreQs, isYt);
