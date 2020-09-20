@@ -68,6 +68,6 @@ function checkCacheValidity(cache, key) {
 		return Promise.resolve(false);
 	}
 	let diff = Date.now() - data.time;
-	let query = { options: { cache: { period: DEFAULT_CACHE_PERIOD_MINS } } };
+	let query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
 	return getOptions(query).then(opts => diff < +(opts.cache.period) * 60e3);
 }
