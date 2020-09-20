@@ -78,10 +78,11 @@
     return `${str}${n != 1 ? 's' : ''}`;
   });
 
-  var template = Handlebars.compile($('#search-results-template').html());
+  let template = Handlebars.compile($('#search-results-template').html());
   window.addEventListener('message', evt => {
-    evt.source.postMessage({
-      html: template(evt.data.context)
-    }, evt.origin);
+    evt.source.postMessage(
+      {html: template(evt.data.context)},
+      evt.origin
+    );
   });
 </script>
