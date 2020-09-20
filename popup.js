@@ -105,7 +105,7 @@ function render(userClicked = false) {
 				num: otherResults
 			});
 		})
-		.catch(onRequestError);
+		.catch(e => onRequestError(e, userClicked));
 }
 
 function getSearchParams() {
@@ -128,10 +128,18 @@ function getUrl() {
 	}
 }
 
-const AJAX_RETRY_DELAY = 3e3;
-function onRequestError(error) {
-	setUiState('AJAX_ERROR', {msg: error.statusText});
-	setTimeout(render, AJAX_RETRY_DELAY);
+const AJAX_RETRY_DELAY_SEC = 5;
+let retry_countdown = AJAX_RETRY_DELAY_SEC;
+function onRequestError(error, userClicked = false) {
+	console.log(error);
+	if (retry_countdown == 0) {
+		retry_countdown = AJAX_RETRY_DELAY_SEC;
+		render(userClicked);
+		return;
+	}
+	retry_countdown -= 1;
+	setUiState('AJAX_ERROR', {msg: error.statusText, delay: retry_countdown});
+	setTimeout(() => onRequestError(error, userClicked), 1e3);
 }
 
 /* post age calculation */ 
@@ -224,7 +232,7 @@ function setUiState(state, params = null) {
 		}
 		case 'AJAX_ERROR': {
 			params.msg = params.msg || 'error';
-			DOM.statusDiv.text(`${params.msg}, retrying in 3s ...`);
+			DOM.statusDiv.text(`${params.msg}, retrying in ${params.delay}s ...`);
 			break;
 		}
 		case 'YT_VID': {
