@@ -16,8 +16,9 @@
     "activeTab",
     "tabs",
     "storage",
-    "https://ajax.googleapis.com/",
-    "<all_urls>"
+    "http://*/*",
+    "https://*/*",
+    "ftp://*/*"
   ],
   "background": {
       "scripts": [
