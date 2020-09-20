@@ -206,6 +206,14 @@ function displayPosts(posts, url = '') {
 			orderBy: state.opts.orderBy
 		}
 	};
+	messageTemplate(msg);
+}
+
+function messageTemplate(msg) {
+	if (document.readyState !== "complete") {
+		setTimeout(() => messageTemplate(msg), 100);
+		return;
+	}
 	document.getElementById('tFrame').contentWindow.postMessage(msg, '*');
 }
 
