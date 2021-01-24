@@ -46,14 +46,18 @@ function registerHandlers(opts) {
 	});
 
 	// open links in new tab - or not
-	$('body').on('click', 'a', function() {
+	$('body').on('click', 'a', function(e) {
 		let clickedUrl = $(this).attr('href');
-		if (opts.newtab) {
+		if (e.ctrlKey) {
+			/* ctrl + click: do not modify default browser behavior */
+		}
+		else if (opts.newtab) {
 			chrome.tabs.create({
 				url: clickedUrl,
 				active: !opts.newtabInBg
 			});
-		} else {
+		}
+		else {
 			navigateTo(clickedUrl);
 		}
 	});
