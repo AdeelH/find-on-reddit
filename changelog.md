@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.1:
+- Fix bug in ctrl+click behavior.
+- Minor improvements to the options page.
+
 ## v1.5.0:
 - Updated Handlebars.js to latest version to 
   include recently released security patch.
