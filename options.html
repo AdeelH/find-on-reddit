@@ -20,7 +20,7 @@
 				    <div class="container input-group">
 				    	<div class="row option-checkbox-container">
 								<input class="col-xs-1 option-checkbox" type="checkbox" id="old-reddit">
-								<div class="option-checkbox-text col-xs-11">Make all links point to <i>old.reddit.com</i></div>
+								<div class="option-checkbox-text col-xs-11">Make all links point to <code>old.reddit.com</code></div>
 				    	</div>
 				    </div>
 				</div>
@@ -36,8 +36,8 @@
 									Exact match
 								</div><br/><br/>
 								<div class="notes">
-									<p><i>Note 1: If checked, xyz.com will <u>not</u> match xyz.com/abc, xyz.com/abc/def etc.</i></p>
-									<p><i>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</i></p>
+									<p>Note 1: If checked, <code>xyz.com</code> will <u>not</u> match <code>xyz.com/abc</code>, <code>xyz.com/abc/def</code> etc.</p>
+									<p>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</p>
 								</div>
 				    	</div>
 				    	<!-- ignore query-string -->
@@ -48,7 +48,10 @@
 				    	<!-- yt handling -->
 				    	<div class="row option-checkbox-container">
 								<input class="col-xs-1 option-checkbox" type="checkbox" id="yt">
-								<div class="option-checkbox-text col-xs-11">Special handling of YouTube video links</div>
+								<div class="option-checkbox-text col-xs-11">Special handling of YouTube video links</div><br /><br />
+								<div class="notes">
+									<p>i.e. search using the video ID only instead of the full URL to find all variations of YouTube links e.g. <code>youtu.be/dQw4w9WgXcQ</code>, <code>youtube.com/watch?v=dQw4w9WgXcQ</code> and more.</p>
+								</div>
 				    	</div>
 				    </div>
 				</div>
@@ -87,13 +90,13 @@
 								Automaticaly do a non-exact search if exact search return zero results
 							</div><br/><br/>
 							<div class="notes">
-								<p><i>Note: Only applies to auto-search.</i></p>
+								<p>Note: Only applies to auto-search.</p>
 							</div>
 				    	</div>
 				    </div>
 				    <!-- Blacklist -->
 			    	<div class="option-desc">Blacklist</div>
-			    	<p>Add a domain (e.g. <i>facebook.com</i> or <i>reddit.com/me</i>) to the blacklist, one per line. Auto-search will not run on URLs belonging to these domains.</p>
+			    	<p>Add a domain (e.g. <code>facebook.com</code> or <code>reddit.com/me</code>) to the blacklist, one per line. Auto-search will not run on URLs belonging to these domains.</p>
 				    <div class="container input-group">
 				    	<div class="row">
 							<textarea class="form-control" type="textarea" id="blacklist" rows="4"></textarea>
@@ -117,8 +120,8 @@
 								<option class="sort-option" value="subreddit">subreddit</option>
 							</select>
 					    	<!-- sort order -->
-							<div class="option-checkbox-text col-xs-1">descending</div>
 							<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
+							<div class="option-checkbox-text col-xs-1">descending</div>
 				    	</div>
 				    </div>
 				    <!-- Links -->
@@ -133,7 +136,7 @@
 					    	<!-- background? -->
 					    	<div class="row option-checkbox-container">
 								<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
-								<div class="option-checkbox-text col-xs-11">Open new tab in background</div>
+								<div class="option-checkbox-text col-xs-11">Open new tab in the background without switching to it. Allows opening multiple links without closing the popup. Only applies if the above option is enabled.</div>
 					    	</div>
 				    	</div>
 				    </div>
@@ -144,14 +147,18 @@
 				<div class="form-group container">
 				    <div class="container input-group">
 				    	<div class="option-input-container">
-								<span class="option-input-text">Cache results for</span>
+							<span class="option-input-text">Cache results for</span>
+							<input class="form-control-sm" type="number" id="cache-period" 
 								<input class="form-control-sm" type="number" id="cache-period" 
-									min="0" max="600">
-								<span class="option-input-text">minutes. (Max: 1440)</span><br/><br/>
-								<div class="notes">
-									<p><i>Note 1: the search button in the popup always bypasses cache</i></p>
-									<p><i>Note 2: the entire cache is cleared on browser start (not on exit because the Chrome API doesn't provide an event for that)</i></p>
-					    	</div>
+							<input class="form-control-sm" type="number" id="cache-period" 
+								<input class="form-control-sm" type="number" id="cache-period" 
+							<input class="form-control-sm" type="number" id="cache-period" 
+								min="0" max="600">
+							<span class="option-input-text">minutes. (Max: 1440)</span><br/><br/>
+							<div class="notes">
+								<p>Note 1: the search button in the popup always bypasses cache</p>
+								<p>Note 2: the entire cache is cleared on browser start (not on exit because the Chrome API doesn't provide an event for that)</p>
+							</div>
 				    	</div>
 				    </div>
 				</div>

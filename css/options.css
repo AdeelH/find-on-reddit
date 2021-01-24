@@ -47,6 +47,19 @@
 
 .notes
 {
+	margin-left: 30px;
 	margin-top: -10px;
 	padding-top: 0;
+	font-size: 90%;
+	line-height: 80%;
+}
+
+#order-desc 
+{
+	margin-left: 20px;
+}
+
+code
+{
+	color: rgba(0, 0, 0, 0.8);
 }
