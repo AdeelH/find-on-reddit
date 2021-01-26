@@ -1,7 +1,7 @@
 # Changelog
 
-## v1.5.1:
-- Fix bug in ctrl+click behavior.
+## v1.5.2:
+- Fix bug in ctrl/cmd/shift/alt+click behavior.
 - Minor improvements to the options page.
 
 ## v1.5.0:
