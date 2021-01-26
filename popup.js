@@ -48,8 +48,9 @@ function registerHandlers(opts) {
 	// open links in new tab - or not
 	$('body').on('click', 'a', function(e) {
 		let clickedUrl = $(this).attr('href');
-		if (e.ctrlKey) {
-			/* ctrl + click: do not modify default browser behavior */
+		if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+			/* ctrl/cmd/shift/alt + click: 
+			do not modify default browser behavior */
 		}
 		else if (opts.newtab) {
 			chrome.tabs.create({
