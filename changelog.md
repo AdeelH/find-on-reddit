@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.3:
+- Update Handlebars.js to 4.7.7 as per https://github.com/advisories/GHSA-f2jv-r9rf-7988.
+
 ## v1.5.2:
 - Fix bug in ctrl/cmd/shift/alt+click behavior.
 - Minor improvements to the options page.
