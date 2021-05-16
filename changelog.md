@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.5.3:
+## v1.5.4:
 - Update Handlebars.js to 4.7.7 as per https://github.com/advisories/GHSA-f2jv-r9rf-7988.
 
 ## v1.5.2:
