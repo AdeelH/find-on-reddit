@@ -1,20 +1,27 @@
 # Changelog
 
 ## v1.5.4:
+- Can now find even more results (in some cases) by using the /duplicates
+  API endpoint. (Thanks Droyk for the suggestion!)
+- Fix bug that cause the popup to close after opening a link using ctrl + click.
+  (Thanks Droyk for the report!)
+- Minor bug fixes.
+
+
+## v1.5.4:
 - Update Handlebars.js to 4.7.7 as per https://github.com/advisories/GHSA-f2jv-r9rf-7988.
 
 ## v1.5.2:
-- Fix bug in ctrl/cmd/shift/alt+click behavior.
+- Fix bug in ctrl/cmd/shift/alt+click behavior. (Thanks NovaDev94 for the report!)
 - Minor improvements to the options page.
 
 ## v1.5.0:
 - Updated Handlebars.js to latest version to 
   include recently released security patch.
-- Fixed bug that caused the popup size/zoom 
-  to change on when a hyperlink was clicked
-  (https://github.com/AdeelH/find-on-reddit/issues/17).
-- Fixed bug that sometimes caused the search 
-  results to not render.
+- Fixed bug that caused the popup size/zoom to change on when a hyperlink was
+  clicked (https://github.com/AdeelH/find-on-reddit/issues/17,
+  thanks nkmathew for the report and debugging help).
+- Fixed bug that sometimes caused the search results to not render.
 - Improved ajax error handling.
 - Minor fixes and improvements.
 
