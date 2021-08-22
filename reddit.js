@@ -2,6 +2,9 @@ const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&
 const INFO_API = 'https://reddit.com/api/info.json?url=';
 
 function findOnReddit(url, useCache = true, exact = true) {
+	if (!exact) {
+		url = url.replace(/^https?\:\/\//i, "")
+	}
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache, exact);
 	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
