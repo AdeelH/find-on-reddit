@@ -1,5 +1,6 @@
 const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
 const INFO_API = 'https://reddit.com/api/info.json?url=';
+const DUPLICATES_API = 'https://api.reddit.com/duplicates/';
 
 function findOnReddit(url, useCache = true, exact = true) {
 	let query = encodeURIComponent(url);
@@ -40,7 +41,33 @@ function search(query, useCache = true, exact = true) {
 
 function getPostsViaApi(requestUrl) {
 	let res = makeApiRequest(requestUrl)
-	return res.then((res) => res.data.children);
+	return res.then((res) => res.data.children).then(add_duplicates);
+}
+
+function add_duplicates(posts) {
+	/**
+	 * Pick the first post, get its duplicates, if there are any that are not
+	 * already in the results, add them.
+	 */
+	if (posts.length == 0) {
+		return posts;
+	}
+	all_ids = new Set(posts.map((p) => p.data.id));
+	id = posts[0].data.id
+	let duplicates = get_duplicates_for_id(id);
+	let newPosts = duplicates
+		.then(ps => ps.filter(p => !all_ids.has(p.data.id)));
+	let expandedPosts = newPosts.then((nps) => posts.concat(nps));
+	return expandedPosts;
+}
+
+function get_duplicates_for_id(post_id) {
+	requestUrl = `${DUPLICATES_API}${post_id}`;
+	// the duplicates API endpoint returns an array of 2, the 2nd element of
+	// which contains the duplicate posts
+	let res = makeApiRequest(requestUrl)
+		.then((res) => (res.length > 1) ? res[1].data.children : []);
+	return res;
 }
 
 function makeApiRequest(url) {
