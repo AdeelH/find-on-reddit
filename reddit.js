@@ -3,6 +3,9 @@ const INFO_API = 'https://reddit.com/api/info.json?url=';
 const DUPLICATES_API = 'https://api.reddit.com/duplicates/';
 
 function findOnReddit(url, useCache = true, exact = true) {
+	if (!exact) {
+		url = url.replace(/^https?\:\/\//i, "")
+	}
 	let query = encodeURIComponent(url);
 	let results = search(query, useCache, exact);
 	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
