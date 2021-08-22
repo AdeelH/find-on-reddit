@@ -48,17 +48,26 @@ function registerHandlers(opts) {
 	// open links in new tab - or not
 	$('body').on('click', 'a', function(e) {
 		let clickedUrl = $(this).attr('href');
-		if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
-			/* ctrl/cmd/shift/alt + click: 
+		if (e.metaKey || e.shiftKey || e.altKey) {
+			/* cmd/shift/alt + click: 
 			do not modify default browser behavior */
-		}
-		else if (opts.newtab) {
+		} else if (e.ctrlKey) {
+			/* Default open-in-new-tab behavior seems to have changed
+			such that the popup gets closed after the click. This overwrites
+			that behavior to ensure that:  */
+			// (1) a new tab is created in the bg
+			chrome.tabs.create({
+				url: clickedUrl,
+				active: false
+			});
+			// (2) the popup remains open (== preventDefault & stopPropagation)
+			return false;
+		} else if (opts.newtab) {
 			chrome.tabs.create({
 				url: clickedUrl,
 				active: !opts.newtabInBg
 			});
-		}
-		else {
+		} else {
 			navigateTo(clickedUrl);
 		}
 	});
@@ -125,8 +134,7 @@ function getUrl() {
 	let urlInput = DOM.urlInput.val();
 	if (urlInput) {
 		return Promise.resolve(urlInput);
-	}
-	else {
+	} else {
 		let urlPromise = getCurrentTabUrl(url);
 		urlPromise.then(url => DOM.urlInput.val(url));
 		return urlPromise;
@@ -279,8 +287,7 @@ function updateUiBasedOnUrl(url, params) {
 	if (isYoutubeUrl(url)) {
 		let state = params.ytHandling ? 'YT_VID' : 'YT_VID_HANDLING_OFF';
 		setUiState(state, { id: getYoutubeVideoId(url) });
-	}
-	else {
+	} else {
 		setUiState('DEFAULT');
 	}
 }
