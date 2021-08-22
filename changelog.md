@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.5.4:
+## v1.5.5:
 - Can now find even more results (in some cases) by using the /duplicates
   API endpoint. (Thanks Droyk for the suggestion!)
 - Fix bug that cause the popup to close after opening a link using ctrl + click.
