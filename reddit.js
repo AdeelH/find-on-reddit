@@ -11,7 +11,7 @@ function findOnReddit(url, useCache = true, exact = true) {
 function search(query, useCache = true, exact = true) {
 	let requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
 	if (!useCache) {
-		return makeApiRequest(requestUrl).then(res => res.data.children);
+		return getPostsViaApi(requestUrl);
 	}
 	return searchCache(query).then(cache => {
 		let data = cache[query] || {};
@@ -25,7 +25,7 @@ function search(query, useCache = true, exact = true) {
 				}
 				return posts;
 			} else {
-				let res = makeApiRequest(requestUrl).then(res => res.data.children);
+				let res = getPostsViaApi(requestUrl);
 				if (otherResults) {
 					res.then(posts => {
 						posts.other = otherResults.posts.length;
@@ -36,6 +36,11 @@ function search(query, useCache = true, exact = true) {
 			}
 		});
 	});
+}
+
+function getPostsViaApi(requestUrl) {
+	let res = makeApiRequest(requestUrl)
+	return res.then((res) => res.data.children);
 }
 
 function makeApiRequest(url) {
