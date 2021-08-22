@@ -3,6 +3,8 @@
 ## v1.5.5:
 - Can now find even more results (in some cases) by using the /duplicates
   API endpoint. (Thanks Droyk for the suggestion!)
+- Can now find even more results (in some cases) by omitting the URL protocol
+  when doing a fuzzy search.
 - Fix bug that cause the popup to close after opening a link using ctrl + click.
   (Thanks Droyk for the report!)
 - Minor bug fixes.
