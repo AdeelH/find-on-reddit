@@ -1,16 +1,16 @@
 {
   "manifest_version": 2,
-
   "name": "Find on Reddit",
   "description": "Find discussions of the current URL on Reddit",
   "version": "1.5.5",
-
   "browser_action": {
     "default_icon": "icon-256.png",
     "default_popup": "popup.html"
   },
   "sandbox": {
-     "pages": ["template.html"]
+    "pages": [
+      "template.html"
+    ]
   },
   "permissions": [
     "activeTab",
@@ -21,15 +21,15 @@
     "ftp://*/*"
   ],
   "background": {
-      "scripts": [
-        "js/jquery.min.js",
-        "chrome.js",
-        "url.js",
-        "reddit.js",
-        "query.js",
-        "background.js"
-      ],
-      "persistent": false
+    "scripts": [
+      "js/jquery.min.js",
+      "chrome.js",
+      "url.js",
+      "reddit.js",
+      "query.js",
+      "background.js"
+    ],
+    "persistent": false
   },
   "options_page": "options.html",
   "icons": {
