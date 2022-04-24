@@ -1,3 +1,6 @@
+import {getOptions, updateOptions} from './chrome.js';
+import {allOptions} from './query.js';
+
 $(document).ready(init);
 
 let DOM;
@@ -36,7 +39,6 @@ function saveOptions() {
 	};
 	updateOptions(options)
 		.then(notifySuccess)
-		.then(reloadBackgroundPage)
 		.then(restoreOptions)
 		.catch(notifyFailure);
 }
