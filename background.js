@@ -3,48 +3,59 @@ import {processUrl, removeQueryString, isYoutubeUrl} from './url.js';
 import {findOnReddit} from './reddit.js';
 import {bgOptions} from './query.js';
 
+
 const BADGE_COLORS = {
 	error: '#DD1616',
 	success: '#555555'
 };
+
 let bgOpts;
 
+// The respective listeneres will noop if these are false. This hack is needed
+// because we can no longer restart the background page in v3.
+let tabUpdatedListenerActive = false;
+let tabActivatedListenerActive = false;
+
+// Throttling mechanism to handle multiple firings of the tabs.onUpdated event
+// as the tab goes through different states while loading.
+let recentlyQueried = new Set([]);
+
+// this function seems to run only once in v3, which is fine
 (function init() {
 	// Avoid storage bloat. Ideally, this should happen on browser exit, 
-	// but the Chrome API doesn't provide an event for that
+	// but the Chrome API doesn't provide an event for that.
 	clearCache();
-	getOptions(bgOptions).then(opts => {
-		bgOpts = opts;
-		registerHandlers();
-	});
+	chrome.tabs.onUpdated.addListener(tabUpdatedListener);
+	chrome.tabs.onActivated.addListener(tabActivatedListener);
+	updateListenerFlags();
 })();
 
-function registerHandlers() {
-	if (bgOpts.autorun.updated) {
-		if (!chrome.tabs.onUpdated.hasListener(tabUpdatedListener)) {
-			chrome.tabs.onUpdated.addListener(tabUpdatedListener);
-		}
-	} else {
-		if (chrome.tabs.onUpdated.hasListener(tabUpdatedListener)) {
-			chrome.tabs.onUpdated.removeListener(tabUpdatedListener);
-		}
-	}
-	if (bgOpts.autorun.activated) {
-		if (!chrome.tabs.onActivated.hasListener(tabActivatedListener)) {
-			chrome.tabs.onActivated.addListener(tabActivatedListener);
-		}
-	} else {
-		if (chrome.tabs.onActivated.hasListener(tabActivatedListener)) {
-			chrome.tabs.onActivated.removeListener(tabActivatedListener);
-		}
-	}
+function updateListenerFlags() {
+	getOptions(bgOptions).then(opts => {
+		bgOpts = opts;
+		tabUpdatedListenerActive = bgOpts.autorun.updated
+		tabActivatedListenerActive = bgOpts.autorun.activated;
+	});
 }
 
 function tabUpdatedListener(tabId, info, tab) {
+	updateListenerFlags();
+	if (!tabUpdatedListenerActive) {
+		return;
+	}
+	if (recentlyQueried.has(tab.url)) {
+		return;
+	}
+	recentlyQueried.add(tab.url);
+	setTimeout(() => recentlyQueried.delete(tab.url), 1e3);
 	return removeBadge(tabId).then(() => autoFind(tabId, tab.url));
 }
 
 function tabActivatedListener(activeInfo) {
+	updateListenerFlags();
+	if (!tabActivatedListenerActive) {
+		return;
+	}
 	let tabId = activeInfo.tabId;
 	return getTabById(tabId).then(tab => autoFind(tabId, tab.url));
 }
