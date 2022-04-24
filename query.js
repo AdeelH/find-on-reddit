@@ -26,7 +26,8 @@ export const autorun = {
 	updated: true,
 	activated: true,
 	retryExact: true,
-	retryError: true
+	retryError: true,
+	badgeContent: 'num_posts'
 };
 
 export const bgOptions = {

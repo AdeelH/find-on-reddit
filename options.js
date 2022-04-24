@@ -24,7 +24,8 @@ function saveOptions() {
 			updated: DOM.opts.updated.prop('checked'),
 			activated: DOM.opts.activated.prop('checked'),
 			retryExact: DOM.opts.retryExact.prop('checked'),
-			retryError: DOM.opts.retryError.prop('checked')
+			retryError: DOM.opts.retryError.prop('checked'),
+			badgeContent: DOM.opts.badgeContent.val(),
 		},
 		popup: {
 			newtab: DOM.opts.newtab.prop('checked'),
@@ -60,11 +61,13 @@ function restoreOptions() {
 		DOM.opts.newtab.prop('checked', opts.popup.newtab);
 		DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
 
-		DOM.opts.cachePeriod.val(opts.cache.period);
-		DOM.opts.blacklist.val(opts.blacklist.join('\n'));
+		DOM.opts.badgeContent.val(opts.autorun.badgeContent);
 
 		DOM.opts.orderBy.val(opts.popup.results.orderBy);
 		DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
+
+		DOM.opts.cachePeriod.val(opts.cache.period);
+		DOM.opts.blacklist.val(opts.blacklist.join('\n'));
 	});
 }
 
@@ -98,6 +101,7 @@ function fetchDomHandles() {
 			cachePeriod: $('#cache-period'),
 			blacklist: $('#blacklist'),
 			orderBy: $('#order-by'),
+			badgeContent: $('#badge-content'),
 			orderDesc: $('#order-desc')
 		}
 	};

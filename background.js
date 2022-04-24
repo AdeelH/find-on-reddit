@@ -87,7 +87,7 @@ function searchExact(tabId, url, retryCount = 0) {
 			if (bgOpts.autorun.retryExact && posts.length === 0) {
 				searchNonExact(tabId, url);
 			} else {
-				setResultsBadge(tabId, `${posts.length}`);
+				setResultsBadge(tabId, posts);
 			}
 		})
 		.catch(e => {
@@ -103,7 +103,7 @@ function searchNonExact(tabId, url, retryCount = 0) {
 		return;
 	}
 	findOnReddit(url, true, false)
-		.then(posts => setResultsBadge(tabId, `${posts.length}`))
+		.then(posts => setResultsBadge(tabId, posts))
 		.catch(e => {
 			if (bgOpts.autorun.retryError) {
 				setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
@@ -133,8 +133,28 @@ function setErrorBadge(tabId) {
 	return setBadge(tabId, 'X', BADGE_COLORS.error);
 }
 
-function setResultsBadge(tabId, text) {
-	return setBadge(tabId, text, BADGE_COLORS.success);
+function numToBadgeText(n) {
+	if (n < 1_000) {
+		return `${n}`;
+	} else if (n < 1_000_000) {
+		return `${Math.trunc(n / 1_000)}K`;
+	} else if (n < 1_000_000_000) {
+		return `${Math.trunc(n / 1_000_000)}M`;
+	}
+}
+
+function setResultsBadge(tabId, posts) {
+	let color = BADGE_COLORS.success;
+	if (!posts || posts.length === 0) {
+		return setBadge(tabId, '0', color);
+	}
+	if (bgOpts.autorun.badgeContent === 'num_comments') {
+		let numComments = posts.reduce((acc, p) => acc + p.data.num_comments, 0);
+		return setBadge(tabId, `${numToBadgeText(numComments)}`, color);
+	} else {
+		let numPosts = posts.length;
+		return setBadge(tabId, `${numToBadgeText(numPosts)}`, color);
+	}
 }
 
 function removeBadge(tabId) {
