@@ -1,181 +1,194 @@
 <html>
-	<head>
-		<!-- scripts -->
-	    <script src="js/jquery.min.js"></script>
-		<!-- styles -->
-	    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-	    <link rel="stylesheet" type="text/css" href="css/options.css">
-	    <!-- title -->
-		<title>Options - Find on Reddit</title>
-	</head>
-	<body>
-		<div class="container">
-			<!-- heading -->
-			<h1>Options</h1>
-			<hr>
-			<!-- form -->
-			<form class="form">
-				<!-- old reddit -->
-				<div class="form-group container">
-				    <div class="container input-group">
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="old-reddit">
-								<div class="option-checkbox-text col-xs-11">Make all links point to <code>old.reddit.com</code></div>
-				    	</div>
-				    </div>
-				</div>
-				<hr>
-				<!-- search -->
-				<h3 class="option-section-heading">Search Defaults</h3>
-				<div class="form-group container">
-				    <div class="container input-group">
-				    	<!-- exact match -->
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="exact">
-								<div class="option-checkbox-text col-xs-11">
-									Exact match
-								</div><br/><br/>
-								<div class="notes">
-									<p>Note 1: If checked, <code>xyz.com</code> will <u>not</u> match <code>xyz.com/abc</code>, <code>xyz.com/abc/def</code> etc.</p>
-									<p>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</p>
-								</div>
-				    	</div>
-				    	<!-- ignore query-string -->
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="ignore-qs">
-								<div class="option-checkbox-text col-xs-11">Ignore query-string</div>
-				    	</div>
-				    	<!-- yt handling -->
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="yt">
-								<div class="option-checkbox-text col-xs-11">Special handling of YouTube video links</div><br /><br />
-								<div class="notes">
-									<p>i.e. search using the video ID only instead of the full URL to find all variations of YouTube links e.g. <code>youtu.be/dQw4w9WgXcQ</code>, <code>youtube.com/watch?v=dQw4w9WgXcQ</code> and more.</p>
-								</div>
-				    	</div>
-				    </div>
-				</div>
-				<hr>
-				<!-- autorun -->
-				<h3 class="option-section-heading">Auto-search</h3>
-				<div class="form-group container">
-					<!-- Search/re-search when -->
-			    	<div class="option-desc">Search/re-search when</div>
-				    <div class="container input-group">
-				    	<!-- updated -->
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-updated">
-								<div class="option-checkbox-text col-xs-11">Tab URL updated (on creation, reload, navigation)</div>
-				    	</div>
-				    	<!-- activated -->
-				    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-activated">
-								<div class="option-checkbox-text col-xs-11">Tab selected</div>
-				    	</div>
-				    </div>
-				    <!-- Retry -->
-			    	<div class="option-desc">Retry</div>
-				    <div class="container input-group">
-				    	<!-- retry on error -->
-				    	<div class="row option-checkbox-container">
-							<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-error">
-							<div class="option-checkbox-text col-xs-11">
-								Retry search (every 5 seconds) in case of server error. (Max attempts: 5)
-							</div>
-				    	</div>
-				    	<!-- retry on 0 results-->
-				    	<div class="row option-checkbox-container">
-							<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-exact">
-							<div class="option-checkbox-text col-xs-11">
-								Automaticaly do a non-exact search if exact search return zero results
-							</div><br/><br/>
-							<div class="notes">
-								<p>Note: Only applies to auto-search.</p>
-							</div>
-				    	</div>
-				    </div>
-				    <!-- Blacklist -->
-			    	<div class="option-desc">Blacklist</div>
-			    	<p>Add a domain (e.g. <code>facebook.com</code> or <code>reddit.com/me</code>) to the blacklist, one per line. Auto-search will not run on URLs belonging to these domains.</p>
-				    <div class="container input-group">
-				    	<div class="row">
-							<textarea class="form-control" type="textarea" id="blacklist" rows="4"></textarea>
-				    	</div>
-				    </div>
-				</div>
-				<hr>
-				<!-- popup -->
-				<h3 class="option-section-heading">Popup</h3>
-				<div class="form-group container">
-					<!-- Results -->
-			    	<div class="option-desc">Results</div>
-				    <div class="container input-group">
-				    	<!-- sort -->
-				    	<div class="row option-select-container">
-							<div class="option-select-text col-xs-1">Sort by</div>
-							<select id="order-by" class="select col-xs-2">
-								<option class="sort-option" value="score">score</option>
-								<option class="sort-option" value="comments">comments</option>
-								<option class="sort-option" value="age">age</option>
-								<option class="sort-option" value="subreddit">subreddit</option>
-							</select>
-					    	<!-- sort order -->
-							<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
-							<div class="option-checkbox-text col-xs-1">descending</div>
-				    	</div>
-				    </div>
-				    <!-- Links -->
-			    	<div class="option-desc">Links</div>
-				    <div class="container input-group">
-				    	<div class="option-input-container">
-					    	<!-- new tab? -->
-					    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab">
-								<div class="option-checkbox-text col-xs-11">Open links in new tab</div>
-					    	</div>
-					    	<!-- background? -->
-					    	<div class="row option-checkbox-container">
-								<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
-								<div class="option-checkbox-text col-xs-11">Open new tab in the background without switching to it. Allows opening multiple links without closing the popup. Only applies if the above option is enabled.</div>
-					    	</div>
-				    	</div>
-				    </div>
-				</div>
-				<hr>
-				<!-- caching -->
-				<h3 class="option-section-heading">Caching</h3>
-				<div class="form-group container">
-				    <div class="container input-group">
-				    	<div class="option-input-container">
-							<span class="option-input-text">Cache results for</span>
-							<input class="form-control-sm" type="number" id="cache-period" 
-								<input class="form-control-sm" type="number" id="cache-period" 
-							<input class="form-control-sm" type="number" id="cache-period" 
-								<input class="form-control-sm" type="number" id="cache-period" 
-							<input class="form-control-sm" type="number" id="cache-period" 
-								min="0" max="600">
-							<span class="option-input-text">minutes. (Max: 1440)</span><br/><br/>
-							<div class="notes">
-								<p>Note 1: the search button in the popup always bypasses cache</p>
-								<p>Note 2: the entire cache is cleared on browser start (not on exit because the Chrome API doesn't provide an event for that)</p>
-							</div>
-				    	</div>
-				    </div>
-				</div>
-				<hr>
-				<!-- save -->
-				<div class="save row">
-				    <!-- status -->
-					<div class="col-xs-1">
-						<button id="save" type="button" class="btn btn-default">Save</button>
+
+<head>
+	<!-- scripts -->
+	<script src="js/jquery.min.js"></script>
+	<!-- styles -->
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/options.css">
+	<!-- title -->
+	<title>Options - Find on Reddit</title>
+</head>
+
+<body>
+	<div class="container">
+		<!-- heading -->
+		<h1>Options</h1>
+		<hr>
+		<!-- form -->
+		<form class="form">
+			<!-- old reddit -->
+			<div class="form-group container">
+				<div class="container input-group">
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="old-reddit">
+						<div class="option-checkbox-text col-xs-11">Make all links point to <code>old.reddit.com</code>
+						</div>
 					</div>
-					<div id="status" class="save-status col-xs-11"></div>
 				</div>
-			</form>
-		</div>
-		<!-- scripts -->
+			</div>
+			<hr>
+			<!-- search -->
+			<h3 class="option-section-heading">Search Defaults</h3>
+			<div class="form-group container">
+				<div class="container input-group">
+					<!-- exact match -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="exact">
+						<div class="option-checkbox-text col-xs-11">
+							Exact match
+						</div><br /><br />
+						<div class="notes">
+							<p>Note 1: If checked, <code>xyz.com</code> will <u>not</u> match <code>xyz.com/abc</code>,
+								<code>xyz.com/abc/def</code> etc.
+							</p>
+							<p>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</p>
+						</div>
+					</div>
+					<!-- ignore query-string -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="ignore-qs">
+						<div class="option-checkbox-text col-xs-11">Ignore query-string</div>
+					</div>
+					<!-- yt handling -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="yt">
+						<div class="option-checkbox-text col-xs-11">Special handling of YouTube video links</div>
+						<br /><br />
+						<div class="notes">
+							<p>i.e. search using the video ID only instead of the full URL to find all variations of
+								YouTube links e.g. <code>youtu.be/dQw4w9WgXcQ</code>,
+								<code>youtube.com/watch?v=dQw4w9WgXcQ</code> and more.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<!-- autorun -->
+			<h3 class="option-section-heading">Auto-search</h3>
+			<div class="form-group container">
+				<!-- Search/re-search when -->
+				<div class="option-desc">Search/re-search when</div>
+				<div class="container input-group">
+					<!-- updated -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-updated">
+						<div class="option-checkbox-text col-xs-11">Tab URL updated (on creation, reload, navigation)
+						</div>
+					</div>
+					<!-- activated -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-activated">
+						<div class="option-checkbox-text col-xs-11">Tab selected</div>
+					</div>
+				</div>
+				<!-- Retry -->
+				<div class="option-desc">Retry</div>
+				<div class="container input-group">
+					<!-- retry on error -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-error">
+						<div class="option-checkbox-text col-xs-11">
+							Retry search (every 5 seconds) in case of server error. (Max attempts: 5)
+						</div>
+					</div>
+					<!-- retry on 0 results-->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-exact">
+						<div class="option-checkbox-text col-xs-11">
+							Automaticaly do a non-exact search if exact search return zero results
+						</div><br /><br />
+						<div class="notes">
+							<p>Note: Only applies to auto-search.</p>
+						</div>
+					</div>
+				</div>
+				<!-- Blacklist -->
+				<div class="option-desc">Blacklist</div>
+				<p>Add a domain (e.g. <code>facebook.com</code> or <code>reddit.com/me</code>) to the blacklist, one per
+					line. Auto-search will not run on URLs belonging to these domains.</p>
+				<div class="container input-group">
+					<div class="row">
+						<textarea class="form-control" type="textarea" id="blacklist" rows="4"></textarea>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<!-- popup -->
+			<h3 class="option-section-heading">Popup</h3>
+			<div class="form-group container">
+				<!-- Results -->
+				<div class="option-desc">Results</div>
+				<div class="container input-group">
+					<!-- sort -->
+					<div class="row option-select-container">
+						<div class="option-select-text col-xs-1">Sort by</div>
+						<select id="order-by" class="select col-xs-2">
+							<option class="sort-option" value="score">score</option>
+							<option class="sort-option" value="comments">comments</option>
+							<option class="sort-option" value="age">age</option>
+							<option class="sort-option" value="subreddit">subreddit</option>
+						</select>
+						<!-- sort order -->
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
+						<div class="option-checkbox-text col-xs-1">descending</div>
+					</div>
+				</div>
+				<!-- Links -->
+				<div class="option-desc">Links</div>
+				<div class="container input-group">
+					<div class="option-input-container">
+						<!-- new tab? -->
+						<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab">
+							<div class="option-checkbox-text col-xs-11">Open links in new tab</div>
+						</div>
+						<!-- background? -->
+						<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
+							<div class="option-checkbox-text col-xs-11">Open new tab in the background without switching
+								to it. Allows opening multiple links without closing the popup. Only applies if the
+								above option is enabled.</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<!-- caching -->
+			<h3 class="option-section-heading">Caching</h3>
+			<div class="form-group container">
+				<div class="container input-group">
+					<div class="option-input-container">
+						<span class="option-input-text">Cache results for</span>
+						<input class="form-control-sm" type="number" id="cache-period" <input class="form-control-sm"
+							type="number" id="cache-period" <input class="form-control-sm" type="number"
+							id="cache-period" <input class="form-control-sm" type="number" id="cache-period" <input
+							class="form-control-sm" type="number" id="cache-period" min="0" max="600">
+						<span class="option-input-text">minutes. (Max: 1440)</span><br /><br />
+						<div class="notes">
+							<p>Note 1: the search button in the popup always bypasses cache</p>
+							<p>Note 2: the entire cache is cleared on browser start (not on exit because the Chrome API
+								doesn't provide an event for that)</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<!-- save -->
+			<div class="save row">
+				<!-- status -->
+				<div class="col-xs-1">
+					<button id="save" type="button" class="btn btn-default">Save</button>
+				</div>
+				<div id="status" class="save-status col-xs-11"></div>
+			</div>
+		</form>
+	</div>
+	<!-- scripts -->
 	<script src="chrome.js" type="module"></script>
 	<script src="query.js" type="module"></script>
 	<script src="options.js" type="module"></script>
-	</body>
+</body>
+
 </html>

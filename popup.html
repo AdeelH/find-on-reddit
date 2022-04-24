@@ -1,9 +1,10 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Find on Reddit</title>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+
+<head>
+	<title>Find on Reddit</title>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
 
 	<script src="chrome.js" type="module"></script>
 	<script src="url.js" type="module"></script>
@@ -11,56 +12,58 @@
 	<script src="query.js" type="module"></script>
 	<script src="popup.js" type="module"></script>
 
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/popup.css">
-  </head>
-  <body class="night-mode">
-    <div id="main" class="container-fluid">
-      <div id="url-container" class="row">
-        <form class="form">
-          <div class="form-group">
-            <div class="input-group">
-              <input type="text" id="url" class="form-control" placeholder="url to find...">
-              <div class="input-group-btn">
-                <button id="url-submit" type="button" class="btn btn-default">Search</button>
-              </div>
-            </div>
-            <!-- yt -->
-            <div class="checkbox input-group">
-              <div class="hidden" id="yt-choice">
-                <label>
-                  <input type="checkbox" id="yt" name="yt" checked="">
-                  <span>search by video ID <span id="yt-vid-id"><span></span>
-                </label>
-              </div>
-            </div>
-            <!-- exact -->
-            <div class="checkbox input-group">
-              <div class="" id="exact-choice">
-                <label>
-                  <input type="checkbox" id="exact" checked="">
-                  <span>exact match</span>    
-                  <span id="other-results" class="other-results hidden">
-                    |<i> <span id="other-results-num"></span> </i>
-                  </span>
-                </label>
-              </div>
-            </div>
-            <!-- qs -->
-            <div class="checkbox input-group">
-              <div class="" id="qs-choice">
-                <label>
-                  <input type="checkbox" id="ignore-qs" checked="">
-                  <span>ignore querystring</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div id="status" class="row search-status"></div>
-      <div id="results" class="row"></div>
-    </div>
-    <iframe id="tFrame" class="hidden" src="template.html"></iframe>
-  </body>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/popup.css">
+</head>
+
+<body class="night-mode">
+	<div id="main" class="container-fluid">
+		<div id="url-container" class="row">
+			<form class="form">
+				<div class="form-group">
+					<div class="input-group">
+						<input type="text" id="url" class="form-control" placeholder="url to find...">
+						<div class="input-group-btn">
+							<button id="url-submit" type="button" class="btn btn-default">Search</button>
+						</div>
+					</div>
+					<!-- yt -->
+					<div class="checkbox input-group">
+						<div class="hidden" id="yt-choice">
+							<label>
+								<input type="checkbox" id="yt" name="yt" checked="">
+								<span>search by video ID <span id="yt-vid-id"><span></span>
+							</label>
+						</div>
+					</div>
+					<!-- exact -->
+					<div class="checkbox input-group">
+						<div class="" id="exact-choice">
+							<label>
+								<input type="checkbox" id="exact" checked="">
+								<span>exact match</span>
+								<span id="other-results" class="other-results hidden">
+									|<i> <span id="other-results-num"></span> </i>
+								</span>
+							</label>
+						</div>
+					</div>
+					<!-- qs -->
+					<div class="checkbox input-group">
+						<div class="" id="qs-choice">
+							<label>
+								<input type="checkbox" id="ignore-qs" checked="">
+								<span>ignore querystring</span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div id="status" class="row search-status"></div>
+		<div id="results" class="row"></div>
+	</div>
+	<iframe id="tFrame" class="hidden" src="template.html"></iframe>
+</body>
+
 </html>
