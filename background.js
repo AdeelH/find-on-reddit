@@ -1,3 +1,8 @@
+import {clearCache, getTabById, getOptions, ignoreRejection} from './chrome.js';
+import {processUrl, removeQueryString, isYoutubeUrl} from './url.js';
+import {findOnReddit} from './reddit.js';
+import {bgOptions} from './query.js';
+
 const BADGE_COLORS = {
 	error: '#DD1616',
 	success: '#555555'
@@ -16,19 +21,34 @@ let bgOpts;
 
 function registerHandlers() {
 	if (bgOpts.autorun.updated) {
-		chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-			removeBadge(tabId)
-				.then(() => autoFind(tabId, tab.url));
-		});
+		if (!chrome.tabs.onUpdated.hasListener(tabUpdatedListener)) {
+			chrome.tabs.onUpdated.addListener(tabUpdatedListener);
+		}
+	} else {
+		if (chrome.tabs.onUpdated.hasListener(tabUpdatedListener)) {
+			chrome.tabs.onUpdated.removeListener(tabUpdatedListener);
+		}
 	}
-
 	if (bgOpts.autorun.activated) {
-		chrome.tabs.onActivated.addListener(activeInfo => {
-			let tabId = activeInfo.tabId;
-			getTabById(tabId).then(tab => autoFind(tabId, tab.url));
-		});
+		if (!chrome.tabs.onActivated.hasListener(tabActivatedListener)) {
+			chrome.tabs.onActivated.addListener(tabActivatedListener);
+		}
+	} else {
+		if (chrome.tabs.onActivated.hasListener(tabActivatedListener)) {
+			chrome.tabs.onActivated.removeListener(tabActivatedListener);
+		}
 	}
 }
+
+function tabUpdatedListener(tabId, info, tab) {
+	return removeBadge(tabId).then(() => autoFind(tabId, tab.url));
+}
+
+function tabActivatedListener(activeInfo) {
+	let tabId = activeInfo.tabId;
+	return getTabById(tabId).then(tab => autoFind(tabId, tab.url));
+}
+
 
 function autoFind(tabId, url) {
 	if (!isAllowed(removeQueryString(url))) {
@@ -115,10 +135,10 @@ function setBadge(tabId, text, color) {
 	let bgCol = { color: color, tabId: tabId };
 	return getTabById(tabId).then(tab => {
 		if (!chrome.runtime.lastError) {
-			chrome.browserAction.setBadgeText(badge);
+			chrome.action.setBadgeText(badge);
 		}
 		if (!chrome.runtime.lastError) {
-			chrome.browserAction.setBadgeBackgroundColor(bgCol);
+			chrome.action.setBadgeBackgroundColor(bgCol);
 		}
 	}).catch(ignoreRejection);
 }

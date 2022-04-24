@@ -1,3 +1,8 @@
+import {getOptions, getCurrentTabUrl} from './chrome.js';
+import {processUrl, isYoutubeUrl} from './url.js';
+import {findOnReddit} from './reddit.js';
+import {popupDefaults} from './query.js';
+
 // DOM handles
 let DOM;
 let state = {

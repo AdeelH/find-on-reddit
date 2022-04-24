@@ -1,8 +1,11 @@
-const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
-const INFO_API = 'https://reddit.com/api/info.json?url=';
-const DUPLICATES_API = 'https://api.reddit.com/duplicates/';
+import {getOptions, searchCache, cache, ignoreRejection} from './chrome.js';
+import {DEFAULT_CACHE_PERIOD_MINS} from './query.js';
 
-function findOnReddit(url, useCache = true, exact = true) {
+export const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
+export const INFO_API = 'https://reddit.com/api/info.json?url=';
+export const DUPLICATES_API = 'https://api.reddit.com/duplicates/';
+
+export function findOnReddit(url, useCache = true, exact = true) {
 	if (!exact) {
 		url = url.replace(/^https?\:\/\//i, "")
 	}
@@ -12,7 +15,7 @@ function findOnReddit(url, useCache = true, exact = true) {
 	return results;
 }
 
-function search(query, useCache = true, exact = true) {
+export function search(query, useCache = true, exact = true) {
 	let requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
 	if (!useCache) {
 		return getPostsViaApi(requestUrl);
@@ -23,7 +26,7 @@ function search(query, useCache = true, exact = true) {
 		let otherResults = data[exact ? 'nonExact' : 'exact'];
 		return checkCacheValidity(data, key).then(isValid => {
 			if (isValid) {
-				posts = data[key].posts;
+				let posts = data[key].posts;
 				if (otherResults) {
 					posts.other = otherResults.posts.length;
 				}
@@ -42,12 +45,12 @@ function search(query, useCache = true, exact = true) {
 	});
 }
 
-function getPostsViaApi(requestUrl) {
+export function getPostsViaApi(requestUrl) {
 	let res = makeApiRequest(requestUrl)
-	return res.then((res) => res.data.children).then(add_duplicates);
+	return res.then(res => res.data.children).then(add_duplicates);
 }
 
-function add_duplicates(posts) {
+export function add_duplicates(posts) {
 	/**
 	 * Pick the first post, get its duplicates, if there are any that are not
 	 * already in the results, add them.
@@ -55,8 +58,8 @@ function add_duplicates(posts) {
 	if (posts.length == 0) {
 		return posts;
 	}
-	all_ids = new Set(posts.map((p) => p.data.id));
-	id = posts[0].data.id
+	let all_ids = new Set(posts.map((p) => p.data.id));
+	let id = posts[0].data.id
 	let duplicates = get_duplicates_for_id(id);
 	let newPosts = duplicates
 		.then(ps => ps.filter(p => !all_ids.has(p.data.id)));
@@ -64,8 +67,8 @@ function add_duplicates(posts) {
 	return expandedPosts;
 }
 
-function get_duplicates_for_id(post_id) {
-	requestUrl = `${DUPLICATES_API}${post_id}`;
+export function get_duplicates_for_id(post_id) {
+	let requestUrl = `${DUPLICATES_API}${post_id}`;
 	// the duplicates API endpoint returns an array of 2, the 2nd element of
 	// which contains the duplicate posts
 	let res = makeApiRequest(requestUrl)
@@ -73,14 +76,11 @@ function get_duplicates_for_id(post_id) {
 	return res;
 }
 
-function makeApiRequest(url) {
-	console.log('cache miss');
-	return new Promise((resolve, reject) => {
-		$.get(url).done(resolve).fail(reject);
-	});
+export function makeApiRequest(url) {
+	return fetch(url).then(res => res.json());
 }
 
-function cachePosts(query, posts, exact) {
+export function cachePosts(query, posts, exact) {
 	let key = exact ? 'exact' : 'nonExact';
 	searchCache(query).then(c => {
 		let objectToStore = {};
@@ -94,7 +94,7 @@ function cachePosts(query, posts, exact) {
 	});
 }
 
-function checkCacheValidity(cache, key) {
+export function checkCacheValidity(cache, key) {
 	if (!cache.hasOwnProperty(key)) {
 		return Promise.resolve(false);
 	}

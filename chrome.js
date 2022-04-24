@@ -1,9 +1,10 @@
+import {allOptions} from './query.js';
 
-function getCurrentTabUrl() {
+export function getCurrentTabUrl() {
 	return getCurrentTab().then(tab => tab.url);
 }
 
-function getCurrentTab() {
+export function getCurrentTab() {
 	let query = {
 		active: true,
 		currentWindow: true
@@ -13,13 +14,13 @@ function getCurrentTab() {
 	});
 }
 
-function getTabById(tabId) {
+export function getTabById(tabId) {
 	return new Promise((resolve, reject) => {
 		chrome.tabs.get(tabId, resolve);
 	});
 }
 
-function navigateTo(url) {
+export function navigateTo(url) {
 	return getCurrentTab().then(tab => {
 		if (!chrome.runtime.lastError) {
 			chrome.tabs.update(tab.id, {url: url});
@@ -27,42 +28,36 @@ function navigateTo(url) {
 	});
 }
 
-function searchCache(query) {
+export function searchCache(query) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.local.get(query, resolve);
 	});
 }
 
-function clearCache() {
+export function clearCache() {
 	return new Promise((resolve, reject) => {
 		chrome.storage.local.clear(resolve);
 	});
 }
 
-function cache(data) {
+export function cache(data) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.local.set(data, resolve);
 	});
 }
 
-function updateOptions(data) {
+export function updateOptions(data) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.sync.set({ options: data }, resolve);
 	});
 }
 
-function getOptions(query) {
+export function getOptions(query) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.sync.get({options: query}, data => resolve(data.options));
 	});
 }
 
-function reloadBackgroundPage() {
-	return new Promise((resolve, reject) => {
-		chrome.runtime.getBackgroundPage(bgPage => resolve(bgPage.location.reload()));
-	});
-}
-
-function ignoreRejection(...args) {
+export function ignoreRejection(...args) {
 	return Promise.resolve();
 }
