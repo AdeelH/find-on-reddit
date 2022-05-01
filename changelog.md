@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.6:
+- Add option to show comment count instead of post count on extension icon when
+  using auto-search.
+- Update to manifest v3.
+- Code improvements.
+
 ## v1.5.5:
 - Can now find even more results (in some cases) by using the /duplicates
   API endpoint. (Thanks Droyk for the suggestion!)
@@ -8,7 +14,6 @@
 - Fix bug that cause the popup to close after opening a link using ctrl + click.
   (Thanks Droyk for the report!)
 - Minor bug fixes.
-
 
 ## v1.5.4:
 - Update Handlebars.js to 4.7.7 as per https://github.com/advisories/GHSA-f2jv-r9rf-7988.
