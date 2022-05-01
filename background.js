@@ -30,15 +30,14 @@ let recentlyQueried = new Set([]);
 	updateListenerFlags();
 })();
 
-function updateListenerFlags() {
-	getOptions(bgOptions).then(opts => {
-		bgOpts = opts;
-		tabUpdatedListenerActive = bgOpts.autorun.updated
-		tabActivatedListenerActive = bgOpts.autorun.activated;
-	});
+async function updateListenerFlags() {
+	const opts = await getOptions(bgOptions);
+	bgOpts = opts;
+	tabUpdatedListenerActive = bgOpts.autorun.updated;
+	tabActivatedListenerActive = bgOpts.autorun.activated;
 }
 
-function tabUpdatedListener(tabId, info, tab) {
+async function tabUpdatedListener(tabId, info, tab) {
 	updateListenerFlags();
 	if (!tabUpdatedListenerActive) {
 		return;
@@ -48,80 +47,82 @@ function tabUpdatedListener(tabId, info, tab) {
 	}
 	recentlyQueried.add(tab.url);
 	setTimeout(() => recentlyQueried.delete(tab.url), 1e3);
-	return removeBadge(tabId).then(() => autoFind(tabId, tab.url));
+	await removeBadge(tabId);
+	return autoSearch(tabId, tab.url);
 }
 
-function tabActivatedListener(activeInfo) {
+async function tabActivatedListener(activeInfo) {
 	updateListenerFlags();
 	if (!tabActivatedListenerActive) {
 		return;
 	}
-	let tabId = activeInfo.tabId;
-	return getTabById(tabId).then(tab => autoFind(tabId, tab.url));
+	const tabId = activeInfo.tabId;
+	const tab = await getTabById(tabId);
+	return autoSearch(tabId, tab.url);
 }
 
 
-function autoFind(tabId, url) {
+async function autoSearch(tabId, url) {
 	if (!isAllowed(removeQueryString(url))) {
 		return;
 	}
-	let isYt = isYoutubeUrl(url) && bgOpts.search.ytHandling;
-	let exactMatch = bgOpts.search.exactMatch && !isYt;
-	let urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
-
+	const isYt = isYoutubeUrl(url) && bgOpts.search.ytHandling;
+	const exactMatch = bgOpts.search.exactMatch && !isYt;
+	const urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
+	let posts;
 	if (exactMatch) {
-		searchExact(tabId, urlToSearch);
+		posts = await searchExact(tabId, urlToSearch);
 	} else {
-		searchNonExact(tabId, urlToSearch);
+		posts = await searchNonExact(tabId, urlToSearch);
 	}
+	return setResultsBadge(tabId, posts);
 }
 
 const BG_RETRY_INTERVAL = 5e3;
 const MAX_RETRIES = 5;
-function searchExact(tabId, url, retryCount = 0) {
+async function searchExact(tabId, url, retryCount = 0) {
 	if (retryCount >= MAX_RETRIES) {
 		return;
 	}
-	findOnReddit(url, true, true)
-		.then(posts => {
-			if (bgOpts.autorun.retryExact && posts.length === 0) {
-				searchNonExact(tabId, url);
-			} else {
-				setResultsBadge(tabId, posts);
-			}
-		})
-		.catch(e => {
-			if (bgOpts.autorun.retryError) {
-				setTimeout(() => searchExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
-			}
-			handleError(e, tabId);
-		});
+	try {
+		const posts = await findOnReddit(url, true, true)
+		if (bgOpts.autorun.retryExact && posts.length === 0) {
+			return searchNonExact(tabId, url);
+		}
+		return posts;
+	} catch (e) {
+		if (bgOpts.autorun.retryError) {
+			setTimeout(() => searchExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
+		}
+		await handleError(e, tabId);
+	}
 }
 
-function searchNonExact(tabId, url, retryCount = 0) {
+async function searchNonExact(tabId, url, retryCount = 0) {
 	if (retryCount >= MAX_RETRIES) {
 		return;
 	}
-	findOnReddit(url, true, false)
-		.then(posts => setResultsBadge(tabId, posts))
-		.catch(e => {
-			if (bgOpts.autorun.retryError) {
-				setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
-			}
-			handleError(e, tabId);
-		});
+	try {
+		return findOnReddit(url, true, false);
+	} catch (e) {
+		if (bgOpts.autorun.retryError) {
+			setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
+		}
+		await handleError(e, tabId);
+	}
 }
 
 function isAllowed(url) {
 	url = url.toLowerCase();
-	return !(isChromeUrl(url) || isBlackListed(url));
+	return (url.length > 0) && !(isChromeUrl(url) || isBlackListed(url));
 }
 
 function isBlackListed(url) {
 	return bgOpts.blacklist.some(s => url.search(s) > -1);
 }
 
-function handleError(e, tabId) {
+async function handleError(e, tabId) {
+	console.log(e);
 	return setErrorBadge(tabId);
 }
 
@@ -129,7 +130,7 @@ function isChromeUrl(url) {
 	return /^chrome/.test(url);
 }
 
-function setErrorBadge(tabId) {
+async function setErrorBadge(tabId) {
 	return setBadge(tabId, 'X', BADGE_COLORS.error);
 }
 
@@ -137,39 +138,42 @@ function numToBadgeText(n) {
 	if (n < 1_000) {
 		return `${n}`;
 	} else if (n < 1_000_000) {
-		return `${Math.trunc(n / 1_000)}K`;
+		return `${Math.trunc(n / 1_000)}K+`;
 	} else if (n < 1_000_000_000) {
-		return `${Math.trunc(n / 1_000_000)}M`;
+		return `${Math.trunc(n / 1_000_000)}M+`;
 	}
 }
 
-function setResultsBadge(tabId, posts) {
-	let color = BADGE_COLORS.success;
+async function setResultsBadge(tabId, posts) {
+	const color = BADGE_COLORS.success;
 	if (!posts || posts.length === 0) {
 		return setBadge(tabId, '0', color);
 	}
 	if (bgOpts.autorun.badgeContent === 'num_comments') {
-		let numComments = posts.reduce((acc, p) => acc + p.data.num_comments, 0);
+		const numComments = posts.reduce((acc, p) => acc + p.data.num_comments, 0);
 		return setBadge(tabId, `${numToBadgeText(numComments)}`, color);
 	} else {
-		let numPosts = posts.length;
+		const numPosts = posts.length;
 		return setBadge(tabId, `${numToBadgeText(numPosts)}`, color);
 	}
 }
 
-function removeBadge(tabId) {
-	return setResultsBadge(tabId, '');
+async function removeBadge(tabId) {
+	return setBadge(tabId, '', BADGE_COLORS.success);
 }
 
-function setBadge(tabId, text, color) {
-	let badge = { text: text, tabId: tabId };
-	let bgCol = { color: color, tabId: tabId };
-	return getTabById(tabId).then(tab => {
+async function setBadge(tabId, text, color) {
+	const badge = { text: text, tabId: tabId };
+	const bgCol = { color: color, tabId: tabId };
+	try {
+		const tab = await getTabById(tabId);
 		if (!chrome.runtime.lastError) {
 			chrome.action.setBadgeText(badge);
 		}
 		if (!chrome.runtime.lastError) {
 			chrome.action.setBadgeBackgroundColor(bgCol);
 		}
-	}).catch(ignoreRejection);
+	} catch (args) {
+		return ignoreRejection(args);
+	}
 }
