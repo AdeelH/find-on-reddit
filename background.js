@@ -31,7 +31,7 @@ let recentlyQueried = new Set([]);
 })();
 
 function updateListenerFlags() {
-	getOptions(bgOptions).then(opts => {
+	return getOptions(bgOptions).then(opts => {
 		bgOpts = opts;
 		tabUpdatedListenerActive = bgOpts.autorun.updated
 		tabActivatedListenerActive = bgOpts.autorun.activated;
@@ -48,7 +48,7 @@ function tabUpdatedListener(tabId, info, tab) {
 	}
 	recentlyQueried.add(tab.url);
 	setTimeout(() => recentlyQueried.delete(tab.url), 1e3);
-	return removeBadge(tabId).then(() => autoFind(tabId, tab.url));
+	return removeBadge(tabId).then(() => autoSearch(tabId, tab.url));
 }
 
 function tabActivatedListener(activeInfo) {
@@ -57,23 +57,24 @@ function tabActivatedListener(activeInfo) {
 		return;
 	}
 	let tabId = activeInfo.tabId;
-	return getTabById(tabId).then(tab => autoFind(tabId, tab.url));
+	return getTabById(tabId).then(tab => autoSearch(tabId, tab.url));
 }
 
 
-function autoFind(tabId, url) {
+function autoSearch(tabId, url) {
 	if (!isAllowed(removeQueryString(url))) {
 		return;
 	}
 	let isYt = isYoutubeUrl(url) && bgOpts.search.ytHandling;
 	let exactMatch = bgOpts.search.exactMatch && !isYt;
 	let urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
-
+	let posts;
 	if (exactMatch) {
-		searchExact(tabId, urlToSearch);
+		posts = searchExact(tabId, urlToSearch);
 	} else {
-		searchNonExact(tabId, urlToSearch);
+		posts = searchNonExact(tabId, urlToSearch);
 	}
+	return posts.then(posts => setResultsBadge(tabId, posts));
 }
 
 const BG_RETRY_INTERVAL = 5e3;
@@ -82,13 +83,12 @@ function searchExact(tabId, url, retryCount = 0) {
 	if (retryCount >= MAX_RETRIES) {
 		return;
 	}
-	findOnReddit(url, true, true)
+	return findOnReddit(url, true, true)
 		.then(posts => {
 			if (bgOpts.autorun.retryExact && posts.length === 0) {
-				searchNonExact(tabId, url);
-			} else {
-				setResultsBadge(tabId, posts);
+				return searchNonExact(tabId, url);
 			}
+			return Promise.resolve(posts);
 		})
 		.catch(e => {
 			if (bgOpts.autorun.retryError) {
@@ -102,8 +102,7 @@ function searchNonExact(tabId, url, retryCount = 0) {
 	if (retryCount >= MAX_RETRIES) {
 		return;
 	}
-	findOnReddit(url, true, false)
-		.then(posts => setResultsBadge(tabId, posts))
+	return findOnReddit(url, true, false)
 		.catch(e => {
 			if (bgOpts.autorun.retryError) {
 				setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);
@@ -114,7 +113,7 @@ function searchNonExact(tabId, url, retryCount = 0) {
 
 function isAllowed(url) {
 	url = url.toLowerCase();
-	return !(isChromeUrl(url) || isBlackListed(url));
+	return (url.length > 0) && !(isChromeUrl(url) || isBlackListed(url));
 }
 
 function isBlackListed(url) {
@@ -137,9 +136,9 @@ function numToBadgeText(n) {
 	if (n < 1_000) {
 		return `${n}`;
 	} else if (n < 1_000_000) {
-		return `${Math.trunc(n / 1_000)}K`;
+		return `${Math.trunc(n / 1_000)}K+`;
 	} else if (n < 1_000_000_000) {
-		return `${Math.trunc(n / 1_000_000)}M`;
+		return `${Math.trunc(n / 1_000_000)}M+`;
 	}
 }
 
@@ -158,7 +157,7 @@ function setResultsBadge(tabId, posts) {
 }
 
 function removeBadge(tabId) {
-	return setResultsBadge(tabId, '');
+	return setBadge(tabId, '', BADGE_COLORS.success);
 }
 
 function setBadge(tabId, text, color) {
