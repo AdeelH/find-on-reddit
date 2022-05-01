@@ -7,13 +7,13 @@ let DOM;
 
 function init() {
 	DOM = fetchDomHandles();
-	restoreOptions();
 	DOM.saveButton.click(saveOptions);
+	restoreOptions();
 }
 
 const CACHE_MAX = 60 * 24;
-function saveOptions() {
-	let options = {
+async function saveOptions() {
+	const options = {
 		oldReddit: DOM.opts.oldReddit.prop('checked'),
 		search: {
 			exactMatch: DOM.opts.exactMatch.prop('checked'),
@@ -38,37 +38,40 @@ function saveOptions() {
 		cache: { period: getCachePeriod() },
 		blacklist: getBlacklist()
 	};
-	updateOptions(options)
-		.then(notifySuccess)
-		.then(restoreOptions)
-		.catch(notifyFailure);
+	try {
+		await updateOptions(options);
+	} catch(e) {
+		notifyFailure();
+	}
+	notifySuccess();
+	await restoreOptions();
 }
 
-function restoreOptions() {
-	getOptions(allOptions).then(opts => {
+async function restoreOptions() {
+	const opts = await getOptions(allOptions);
+	console.log(opts);
 
-		DOM.opts.oldReddit.prop('checked', opts.oldReddit);
-		
-		DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
-		DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
-		DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
+	DOM.opts.oldReddit.prop('checked', opts.oldReddit);
+	
+	DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
+	DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
+	DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
 
-		DOM.opts.updated.prop('checked', opts.autorun.updated);
-		DOM.opts.activated.prop('checked', opts.autorun.activated);
-		DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
-		DOM.opts.retryError.prop('checked', opts.autorun.retryError);
+	DOM.opts.updated.prop('checked', opts.autorun.updated);
+	DOM.opts.activated.prop('checked', opts.autorun.activated);
+	DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
+	DOM.opts.retryError.prop('checked', opts.autorun.retryError);
 
-		DOM.opts.newtab.prop('checked', opts.popup.newtab);
-		DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
+	DOM.opts.newtab.prop('checked', opts.popup.newtab);
+	DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
 
-		DOM.opts.badgeContent.val(opts.autorun.badgeContent);
+	DOM.opts.badgeContent.val(opts.autorun.badgeContent);
 
-		DOM.opts.orderBy.val(opts.popup.results.orderBy);
-		DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
+	DOM.opts.orderBy.val(opts.popup.results.orderBy);
+	DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
 
-		DOM.opts.cachePeriod.val(opts.cache.period);
-		DOM.opts.blacklist.val(opts.blacklist.join('\n'));
-	});
+	DOM.opts.cachePeriod.val(opts.cache.period);
+	DOM.opts.blacklist.val(opts.blacklist.join('\n'));
 }
 
 function getBlacklist() {
@@ -79,7 +82,7 @@ function getBlacklist() {
 }
 
 function getCachePeriod() {
-	let cachePeriodInput = DOM.opts.cachePeriod.val();
+	const cachePeriodInput = DOM.opts.cachePeriod.val();
 	return Math.max(0, Math.min(CACHE_MAX, cachePeriodInput));
 }
 

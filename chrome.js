@@ -1,11 +1,11 @@
-import {allOptions} from './query.js';
 
-export function getCurrentTabUrl() {
-	return getCurrentTab().then(tab => tab.url);
+export async function getCurrentTabUrl() {
+	const tab = await getCurrentTab();
+	return tab.url;
 }
 
 export function getCurrentTab() {
-	let query = {
+	const query = {
 		active: true,
 		currentWindow: true
 	};
@@ -20,12 +20,11 @@ export function getTabById(tabId) {
 	});
 }
 
-export function navigateTo(url) {
-	return getCurrentTab().then(tab => {
-		if (!chrome.runtime.lastError) {
-			chrome.tabs.update(tab.id, {url: url});
-		}
-	});
+export async function navigateTo(url) {
+	const tab = await getCurrentTab();
+	if (!chrome.runtime.lastError) {
+		chrome.tabs.update(tab.id, { url: url });
+	}
 }
 
 export function searchCache(query) {

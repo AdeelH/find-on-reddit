@@ -5,52 +5,53 @@ export const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&lim
 export const INFO_API = 'https://reddit.com/api/info.json?url=';
 export const DUPLICATES_API = 'https://api.reddit.com/duplicates/';
 
-export function findOnReddit(url, useCache = true, exact = true) {
+export async function findOnReddit(url, useCache = true, exact = true) {
 	if (!exact) {
-		url = url.replace(/^https?\:\/\//i, "")
+		url = url.replace(/^https?\:\/\//i, "");
 	}
-	let query = encodeURIComponent(url);
-	let results = search(query, useCache, exact);
-	results.then(res => cachePosts(query, res, exact)).catch(ignoreRejection);
-	return results;
+	const query = encodeURIComponent(url);
+	const posts = await search(query, useCache, exact);
+	try {
+		cachePosts(query, posts, exact);
+	} catch (e) {
+		ignoreRejection(e);
+	}
+	return posts;
 }
 
-export function search(query, useCache = true, exact = true) {
-	let requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
+export async function search(query, useCache = true, exact = true) {
+	const requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
 	if (!useCache) {
 		return getPostsViaApi(requestUrl);
 	}
-	return searchCache(query).then(cache => {
-		let data = cache[query] || {};
-		let key = exact ? 'exact' : 'nonExact';
-		let otherResults = data[exact ? 'nonExact' : 'exact'];
-		return checkCacheValidity(data, key).then(isValid => {
-			if (isValid) {
-				let posts = data[key].posts;
-				if (otherResults) {
-					posts.other = otherResults.posts.length;
-				}
-				return posts;
-			} else {
-				let res = getPostsViaApi(requestUrl);
-				if (otherResults) {
-					res.then(posts => {
-						posts.other = otherResults.posts.length;
-						return posts;
-					});
-				}
-				return res;
-			}
-		});
-	});
+	const cache = await searchCache(query);
+	const data = cache[query] || {};
+	const key = exact ? 'exact' : 'nonExact';
+	const otherResults = data[exact ? 'nonExact' : 'exact'];
+	const isValid = await checkCacheValidity(data, key);
+	if (isValid) {
+		let posts = data[key].posts;
+		if (otherResults) {
+			posts.other = otherResults.posts.length;
+		}
+		return posts;
+	} else {
+		let posts = await getPostsViaApi(requestUrl);
+		if (otherResults) {
+			posts.other = otherResults.posts.length
+		}
+		return posts;
+	}
 }
 
-export function getPostsViaApi(requestUrl) {
-	let res = makeApiRequest(requestUrl)
-	return res.then(res => res.data.children).then(add_duplicates);
+export async function getPostsViaApi(requestUrl) {
+	const res = await makeApiRequest(requestUrl);
+	const posts = res.data.children;
+	const posts_extended = add_duplicates(posts);
+	return posts_extended;
 }
 
-export function add_duplicates(posts) {
+export async function add_duplicates(posts) {
 	/**
 	 * Pick the first post, get its duplicates, if there are any that are not
 	 * already in the results, add them.
@@ -60,49 +61,51 @@ export function add_duplicates(posts) {
 	}
 	let all_ids = new Set(posts.map((p) => p.data.id));
 	let id = posts[0].data.id
-	let duplicates = get_duplicates_for_id(id);
-	let newPosts = duplicates
-		.then(ps => ps.filter(p => !all_ids.has(p.data.id)));
-	let expandedPosts = newPosts.then((nps) => posts.concat(nps));
+	let duplicates = await get_duplicates_for_id(id);
+	let newPosts = duplicates.filter(p => !all_ids.has(p.data.id));
+	let expandedPosts = posts.concat(newPosts);
 	return expandedPosts;
 }
 
-export function get_duplicates_for_id(post_id) {
-	let requestUrl = `${DUPLICATES_API}${post_id}`;
+export async function get_duplicates_for_id(post_id) {
+	const requestUrl = `${DUPLICATES_API}${post_id}`;
 	// the duplicates API endpoint returns an array of 2, the 2nd element of
 	// which contains the duplicate posts
-	let res = makeApiRequest(requestUrl)
-		.then((res) => (res.length > 1) ? res[1].data.children : []);
-	return res;
+	const res = await makeApiRequest(requestUrl)
+	const posts = (res.length > 1) ? res[1].data.children : [];
+	return posts;
 }
 
-export function makeApiRequest(url) {
-	return fetch(url).then(res => res.json());
+export async function makeApiRequest(url) {
+	const res = await fetch(url);
+	return res.json();
 }
 
-export function cachePosts(query, posts, exact) {
-	let key = exact ? 'exact' : 'nonExact';
-	searchCache(query).then(c => {
-		let objectToStore = {};
-		let data = c[query] || {};
-		data[key] = {
-			posts: posts,
-			time: Date.now()
-		};
-		objectToStore[query] = data;
-		return cache(objectToStore);
-	});
+export async function cachePosts(query, posts, exact) {
+	const key = exact ? 'exact' : 'nonExact';
+	const old_cache = await searchCache(query);
+	
+	let objectToStore = {};
+	let data = old_cache[query] || {};
+	data[key] = {
+		posts: posts,
+		time: Date.now()
+	};
+	objectToStore[query] = data;
+	return cache(objectToStore);
 }
 
-export function checkCacheValidity(cache, key) {
+export async function checkCacheValidity(cache, key) {
 	if (!cache.hasOwnProperty(key)) {
-		return Promise.resolve(false);
+		return false;
 	}
-	let data = cache[key];
+	const data = cache[key];
 	if (!(data.time && data.posts)) {
-		return Promise.resolve(false);
+		return false;
 	}
-	let diff = Date.now() - data.time;
-	let query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
-	return getOptions(query).then(opts => diff < +(opts.cache.period) * 60e3);
+	const diff = Date.now() - data.time;
+	const query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
+	const opts = await getOptions(query);
+	const not_expired = diff < +(opts.cache.period) * 60000
+	return not_expired;
 }
