@@ -1,5 +1,5 @@
 import {getOptions, getCurrentTabUrl} from './chrome.js';
-import {processUrl, isYoutubeUrl} from './url.js';
+import {processUrl, isYoutubeUrl, getYoutubeVideoId} from './url.js';
 import {findOnReddit} from './reddit.js';
 import {popupDefaults} from './query.js';
 
