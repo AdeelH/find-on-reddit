@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.8:
+- Fix a bug causing links to not open in the same tab.
+
 ## v1.5.6:
 - Add option to show comment count instead of post count on extension icon when
   using auto-search.
