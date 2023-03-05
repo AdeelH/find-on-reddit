@@ -69,9 +69,9 @@
 <script src="js/jquery.min.js"></script>
 <script>
   Handlebars.registerHelper('selected', function(val, options) {
-      let div = $('<div>').html(options.fn(this));
-      div.find(`[value=${val}]`).attr('selected', true);
-      return div.html();
+    let div = $('<div>').html(options.fn(this));
+    div.find(`[value=${val}]`).attr('selected', true);
+    return div.html();
   });
 
   Handlebars.registerHelper('pluralize', function(str, n) {
@@ -81,7 +81,7 @@
   let template = Handlebars.compile($('#search-results-template').html());
   window.addEventListener('message', evt => {
     evt.source.postMessage(
-      {html: template(evt.data.context)},
+      { html: template(evt.data.context) },
       evt.origin
     );
   });

@@ -1,7 +1,7 @@
-import { getOptions, getCurrentTabUrl, navigateTo} from './chrome.js';
-import {processUrl, isYoutubeUrl, getYoutubeVideoId} from './url.js';
-import {findOnReddit} from './reddit.js';
-import {popupDefaults} from './query.js';
+import { getOptions, getCurrentTabUrl, navigateTo } from './chrome.js';
+import { processUrl, isYoutubeUrl, getYoutubeVideoId } from './url.js';
+import { findOnReddit } from './reddit.js';
+import { popupDefaults } from './query.js';
 
 // DOM handles
 let DOM;
@@ -77,7 +77,7 @@ function registerHandlers(opts) {
 		}
 	});
 
-	DOM.opts.ytCheckbox.change(function(e) { 
+	DOM.opts.ytCheckbox.change(function(e) {
 		if (this.checked) {
 			setUiState('YT_VID');
 		} else {
@@ -156,18 +156,18 @@ function onRequestError(error, userClicked = false) {
 		return;
 	}
 	retry_countdown -= 1;
-	setUiState('AJAX_ERROR', {msg: error.statusText, delay: retry_countdown});
+	setUiState('AJAX_ERROR', { msg: error.statusText, delay: retry_countdown });
 	setTimeout(() => onRequestError(error, userClicked), 1e3);
 }
 
-/* post age calculation */ 
+/* post age calculation */
 const timeUnits = [
-	{factor: 1/(1e3), name: 'seconds', decis: 0},
-	{factor: 1/(1e3*60), name: 'minutes', decis: 0},
-	{factor: 1/(1e3*60*60), name: 'hours', decis: 0},
-	{factor: 1/(1e3*60*60*24), name: 'days', decis: 0},
-	{factor: 1/(1e3*60*60*24*30), name: 'months', decis: 0},
-	{factor: 1/(1e3*60*60*24*30*12), name: 'years', decis: 1}
+	{ factor: 1 / (1e3), name: 'seconds', decis: 0 },
+	{ factor: 1 / (1e3 * 60), name: 'minutes', decis: 0 },
+	{ factor: 1 / (1e3 * 60 * 60), name: 'hours', decis: 0 },
+	{ factor: 1 / (1e3 * 60 * 60 * 24), name: 'days', decis: 0 },
+	{ factor: 1 / (1e3 * 60 * 60 * 24 * 30), name: 'months', decis: 0 },
+	{ factor: 1 / (1e3 * 60 * 60 * 24 * 30 * 12), name: 'years', decis: 1 }
 ];
 function calcAge(timestampSeconds) {
 	let diffMillis = Date.now() - (timestampSeconds * 1e3);
@@ -189,12 +189,12 @@ let fieldMappings = Object.freeze({
 
 function sortPosts(posts, orderBy = 'score', desc = true) {
 	if (orderBy == 'subreddit') {
-		return posts.sort((a, b) => 
+		return posts.sort((a, b) =>
 			a.data.subreddit.localeCompare(b.data.subreddit) * (2 * desc - 1)
 		);
 	}
 	let field = fieldMappings[orderBy];
-	let comparator = (a, b) => 
+	let comparator = (a, b) =>
 		(a.data[field] - b.data[field]) * (1 - 2 * desc);
 	return posts.sort(comparator);
 }
@@ -242,7 +242,7 @@ function setSearchDefaults(opts) {
 }
 
 function setUiState(state, params = null) {
-	switch(state) {
+	switch (state) {
 		case 'SEARCH_BEGIN': {
 			DOM.statusDiv.text('Searching ...'); break;
 		}

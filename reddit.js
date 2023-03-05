@@ -1,5 +1,5 @@
-import {getOptions, searchCache, cache, ignoreRejection} from './chrome.js';
-import {DEFAULT_CACHE_PERIOD_MINS} from './query.js';
+import { getOptions, searchCache, cache, ignoreRejection } from './chrome.js';
+import { DEFAULT_CACHE_PERIOD_MINS } from './query.js';
 
 export const SEARCH_API = 'https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:';
 export const INFO_API = 'https://reddit.com/api/info.json?url=';
@@ -38,7 +38,7 @@ export async function search(query, useCache = true, exact = true) {
 	} else {
 		let posts = await getPostsViaApi(requestUrl);
 		if (otherResults) {
-			posts.other = otherResults.posts.length
+			posts.other = otherResults.posts.length;
 		}
 		return posts;
 	}
@@ -60,7 +60,7 @@ export async function add_duplicates(posts) {
 		return posts;
 	}
 	let all_ids = new Set(posts.map((p) => p.data.id));
-	let id = posts[0].data.id
+	let id = posts[0].data.id;
 	let duplicates = await get_duplicates_for_id(id);
 	let newPosts = duplicates.filter(p => !all_ids.has(p.data.id));
 	let expandedPosts = posts.concat(newPosts);
@@ -71,7 +71,7 @@ export async function get_duplicates_for_id(post_id) {
 	const requestUrl = `${DUPLICATES_API}${post_id}`;
 	// the duplicates API endpoint returns an array of 2, the 2nd element of
 	// which contains the duplicate posts
-	const res = await makeApiRequest(requestUrl)
+	const res = await makeApiRequest(requestUrl);
 	const posts = (res.length > 1) ? res[1].data.children : [];
 	return posts;
 }
@@ -84,7 +84,7 @@ export async function makeApiRequest(url) {
 export async function cachePosts(query, posts, exact) {
 	const key = exact ? 'exact' : 'nonExact';
 	const old_cache = await searchCache(query);
-	
+
 	let objectToStore = {};
 	let data = old_cache[query] || {};
 	data[key] = {
@@ -106,6 +106,6 @@ export async function checkCacheValidity(cache, key) {
 	const diff = Date.now() - data.time;
 	const query = { cache: { period: DEFAULT_CACHE_PERIOD_MINS } };
 	const opts = await getOptions(query);
-	const not_expired = diff < +(opts.cache.period) * 60000
+	const not_expired = diff < +(opts.cache.period) * 60000;
 	return not_expired;
 }
