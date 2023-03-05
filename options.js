@@ -1,5 +1,5 @@
-import {getOptions, updateOptions} from './chrome.js';
-import {allOptions} from './query.js';
+import { getOptions, updateOptions } from './chrome.js';
+import { allOptions } from './query.js';
 
 $(document).ready(init);
 
@@ -40,7 +40,7 @@ async function saveOptions() {
 	};
 	try {
 		await updateOptions(options);
-	} catch(e) {
+	} catch (e) {
 		notifyFailure();
 	}
 	notifySuccess();
@@ -52,7 +52,7 @@ async function restoreOptions() {
 	console.log(opts);
 
 	DOM.opts.oldReddit.prop('checked', opts.oldReddit);
-	
+
 	DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
 	DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
 	DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);

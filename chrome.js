@@ -53,7 +53,7 @@ export function updateOptions(data) {
 
 export function getOptions(query) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.sync.get({options: query}, data => resolve(data.options));
+		chrome.storage.sync.get({ options: query }, data => resolve(data.options));
 	});
 }
 
