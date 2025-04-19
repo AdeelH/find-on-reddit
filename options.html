@@ -19,11 +19,57 @@
 		<!-- form -->
 		<form class="form">
 			<!-- old reddit -->
+			<h3 class="option-section-heading">Old Reddit</h3>
 			<div class="form-group container">
 				<div class="container input-group">
 					<div class="row option-checkbox-container">
 						<input class="col-xs-1 option-checkbox" type="checkbox" id="old-reddit">
 						<div class="option-checkbox-text col-xs-11">Make all links point to <code>old.reddit.com</code>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<!-- popup -->
+			<h3 class="option-section-heading">Popup</h3>
+			<div class="form-group container">
+				<!-- Results -->
+				<div class="option-desc">Results</div>
+				<div class="container input-group">
+					<!-- sort -->
+					<div class="row option-select-container">
+						<div class="option-select-text col-xs-2">By default, sort results by</div>
+						<select id="order-by" class="select col-xs-2">
+							<option class="sort-options" value="score">score</option>
+							<option class="sort-options" value="comments">comments</option>
+							<option class="sort-options" value="age">age</option>
+							<option class="sort-options" value="subreddit">subreddit</option>
+						</select>
+						<!-- sort order -->
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
+						<div class="option-checkbox-text col-xs-1">descending</div>
+					</div>
+				</div>
+				<!-- Links -->
+				<div class="option-desc">Links</div>
+				<div class="container input-group">
+					<div class="option-input-container">
+						<!-- new tab? -->
+						<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab">
+							<div class="option-checkbox-text col-xs-11">Open links in new tab</div>
+						</div>
+						<!-- background? -->
+						<div class="row option-checkbox-container">
+							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
+							<div class="option-checkbox-text col-xs-11">
+								Open new tab in the background without switching to it. Allows opening multiple links
+								without closing the popup.
+							</div>
+							<br /><br />
+							<div class="notes">
+								<p>Note: Only applies if the above option is enabled.</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -70,18 +116,20 @@
 			<h3 class="option-section-heading">Auto-search</h3>
 			<div class="form-group container">
 				<!-- Search/re-search when -->
-				<div class="option-desc">Search/re-search when</div>
+				<div class="option-desc">When to run the search?</div>
 				<div class="container input-group">
 					<!-- updated -->
 					<div class="row option-checkbox-container">
 						<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-updated">
-						<div class="option-checkbox-text col-xs-11">Tab URL updated (on creation, reload, navigation)
+						<div class="option-checkbox-text col-xs-11">When a tab's URL updates (e.g. you open a new tab,
+							or you go to a different
+							URL on the same tab, or refresh the tab)
 						</div>
 					</div>
 					<!-- activated -->
 					<div class="row option-checkbox-container">
 						<input class="col-xs-1 option-checkbox" type="checkbox" id="autorun-activated">
-						<div class="option-checkbox-text col-xs-11">Tab selected</div>
+						<div class="option-checkbox-text col-xs-11">Every time you go to an already open tab</div>
 					</div>
 				</div>
 				<!-- Retry -->
@@ -123,51 +171,6 @@
 				<div class="container input-group">
 					<div class="row">
 						<textarea class="form-control" type="textarea" id="blacklist" rows="4"></textarea>
-					</div>
-				</div>
-			</div>
-			<hr>
-			<!-- popup -->
-			<h3 class="option-section-heading">Popup</h3>
-			<div class="form-group container">
-				<!-- Results -->
-				<div class="option-desc">Results</div>
-				<div class="container input-group">
-					<!-- sort -->
-					<div class="row option-select-container">
-						<div class="option-select-text col-xs-1">Sort by</div>
-						<select id="order-by" class="select col-xs-2">
-							<option class="sort-options" value="score">score</option>
-							<option class="sort-options" value="comments">comments</option>
-							<option class="sort-options" value="age">age</option>
-							<option class="sort-options" value="subreddit">subreddit</option>
-						</select>
-						<!-- sort order -->
-						<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
-						<div class="option-checkbox-text col-xs-1">descending</div>
-					</div>
-				</div>
-				<!-- Links -->
-				<div class="option-desc">Links</div>
-				<div class="container input-group">
-					<div class="option-input-container">
-						<!-- new tab? -->
-						<div class="row option-checkbox-container">
-							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab">
-							<div class="option-checkbox-text col-xs-11">Open links in new tab</div>
-						</div>
-						<!-- background? -->
-						<div class="row option-checkbox-container">
-							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
-							<div class="option-checkbox-text col-xs-11">
-								Open new tab in the background without switching to it. Allows opening multiple links
-								without closing the popup.
-							</div>
-							<br /><br />
-							<div class="notes">
-								<p>Note: Only applies if the above option is enabled.</p>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
