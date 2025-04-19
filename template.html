@@ -22,10 +22,10 @@
           <span class="pre">sort  </span>
           <select class="sort-options">
             {{#selected orderBy}}
-              <option class="sort-option" value="score">score</option>
-              <option class="sort-option" value="comments">comments</option>
-              <option class="sort-option" value="age">age</option>
-              <option class="sort-option" value="subreddit">subreddit</option>
+              <option class="sort-options" value="score">score</option>
+              <option class="sort-options" value="comments">comments</option>
+              <option class="sort-options" value="age">age</option>
+              <option class="sort-options" value="subreddit">subreddit</option>
             {{/selected}}
           </select>
         </span>
@@ -68,13 +68,13 @@
 
 <script src="js/jquery.min.js"></script>
 <script>
-  Handlebars.registerHelper('selected', function(val, options) {
+  Handlebars.registerHelper('selected', function (val, options) {
     let div = $('<div>').html(options.fn(this));
     div.find(`[value=${val}]`).attr('selected', true);
     return div.html();
   });
 
-  Handlebars.registerHelper('pluralize', function(str, n) {
+  Handlebars.registerHelper('pluralize', function (str, n) {
     return `${str}${n != 1 ? 's' : ''}`;
   });
 

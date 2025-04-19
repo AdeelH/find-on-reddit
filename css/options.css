@@ -41,12 +41,13 @@
 .form-control-sm
 {
 	display: inline !important;
-    min-width: 0;
+	min-width: 0;
 	width: auto !important;
 }
 
 .notes
 {
+	color: #aaa;
 	margin-left: 30px;
 	margin-top: -10px;
 	padding-top: 0;
@@ -54,12 +55,13 @@
 	line-height: 80%;
 }
 
-#order-desc 
+#order-desc
 {
 	margin-left: 20px;
 }
 
 code
 {
-	color: rgba(0, 0, 0, 0.8);
+	color: white;
+	background-color: #555;
 }

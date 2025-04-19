@@ -5,12 +5,13 @@
 	<script src="js/jquery.min.js"></script>
 	<!-- styles -->
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/common.css">
 	<link rel="stylesheet" type="text/css" href="css/options.css">
 	<!-- title -->
 	<title>Options - Find on Reddit</title>
 </head>
 
-<body>
+<body class="night-mode">
 	<div class="container">
 		<!-- heading -->
 		<h1>Options</h1>
@@ -136,10 +137,10 @@
 					<div class="row option-select-container">
 						<div class="option-select-text col-xs-1">Sort by</div>
 						<select id="order-by" class="select col-xs-2">
-							<option class="sort-option" value="score">score</option>
-							<option class="sort-option" value="comments">comments</option>
-							<option class="sort-option" value="age">age</option>
-							<option class="sort-option" value="subreddit">subreddit</option>
+							<option class="sort-options" value="score">score</option>
+							<option class="sort-options" value="comments">comments</option>
+							<option class="sort-options" value="age">age</option>
+							<option class="sort-options" value="subreddit">subreddit</option>
 						</select>
 						<!-- sort order -->
 						<input class="col-xs-1 option-checkbox" type="checkbox" id="order-desc">
@@ -158,9 +159,14 @@
 						<!-- background? -->
 						<div class="row option-checkbox-container">
 							<input class="col-xs-1 option-checkbox" type="checkbox" id="popup-newtab-bg">
-							<div class="option-checkbox-text col-xs-11">Open new tab in the background without switching
-								to it. Allows opening multiple links without closing the popup. Only applies if the
-								above option is enabled.</div>
+							<div class="option-checkbox-text col-xs-11">
+								Open new tab in the background without switching to it. Allows opening multiple links
+								without closing the popup.
+							</div>
+							<br /><br />
+							<div class="notes">
+								<p>Note: Only applies if the above option is enabled.</p>
+							</div>
 						</div>
 					</div>
 				</div>
