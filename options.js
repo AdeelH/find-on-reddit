@@ -15,6 +15,14 @@ const CACHE_MAX = 60 * 24;
 async function saveOptions() {
 	const options = {
 		oldReddit: DOM.opts.oldReddit.prop('checked'),
+		popup: {
+			newtab: DOM.opts.newtab.prop('checked'),
+			newtabInBg: DOM.opts.newtabInBg.prop('checked'),
+			results: {
+				orderBy: DOM.opts.orderBy.val(),
+				desc: DOM.opts.orderDesc.prop('checked')
+			}
+		},
 		search: {
 			exactMatch: DOM.opts.exactMatch.prop('checked'),
 			ignoreQs: DOM.opts.ignoreQs.prop('checked'),
@@ -26,14 +34,6 @@ async function saveOptions() {
 			retryExact: DOM.opts.retryExact.prop('checked'),
 			retryError: DOM.opts.retryError.prop('checked'),
 			badgeContent: DOM.opts.badgeContent.val(),
-		},
-		popup: {
-			newtab: DOM.opts.newtab.prop('checked'),
-			newtabInBg: DOM.opts.newtabInBg.prop('checked'),
-			results: {
-				orderBy: DOM.opts.orderBy.val(),
-				desc: DOM.opts.orderDesc.prop('checked')
-			}
 		},
 		cache: { period: getCachePeriod() },
 		blacklist: getBlacklist()
@@ -49,27 +49,29 @@ async function saveOptions() {
 
 async function restoreOptions() {
 	const opts = await getOptions(allOptions);
-	console.log(opts);
 
+	// old reddit
 	DOM.opts.oldReddit.prop('checked', opts.oldReddit);
 
+	// popup
+	DOM.opts.newtab.prop('checked', opts.popup.newtab);
+	DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
+	DOM.opts.orderBy.val(opts.popup.results.orderBy);
+	DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
+
+	// search
 	DOM.opts.exactMatch.prop('checked', opts.search.exactMatch);
 	DOM.opts.ignoreQs.prop('checked', opts.search.ignoreQs);
 	DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
 
+	// auto-search
 	DOM.opts.updated.prop('checked', opts.autorun.updated);
 	DOM.opts.activated.prop('checked', opts.autorun.activated);
 	DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
 	DOM.opts.retryError.prop('checked', opts.autorun.retryError);
-
-	DOM.opts.newtab.prop('checked', opts.popup.newtab);
-	DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
-
 	DOM.opts.badgeContent.val(opts.autorun.badgeContent);
 
-	DOM.opts.orderBy.val(opts.popup.results.orderBy);
-	DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
-
+	// cache
 	DOM.opts.cachePeriod.val(opts.cache.period);
 	DOM.opts.blacklist.val(opts.blacklist.join('\n'));
 }
