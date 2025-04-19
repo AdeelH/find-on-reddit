@@ -1,4 +1,4 @@
-body 
+body
 {
   background-color: #ccc;
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
@@ -6,7 +6,7 @@ body
   font-size: 13px;
 }
 
-#main 
+#main
 {
   max-width: 95%;
   padding: 20px;
@@ -27,7 +27,7 @@ body
   padding: 10px 10px 10px 5px;
 }
 
-td 
+td
 {
   padding: 10px;
   vertical-align: middle !important;
@@ -36,106 +36,10 @@ td
 td.score,
 td.subreddit
 {
-	text-align: center;
+  text-align: center;
 }
 
 .score
 {
   font-size: 15px;
-}
-
-.night-mode
-{
-	background-color: #333;
-	color: white;
-}
-
-.night-mode a
-{
-  color: #ddd;
-  text-decoration: none;
-}
-
-.night-mode a:hover
-{
-  color: white;
-}
-
-.night-mode a.pop:hover
-{
-  font-size: 1.1em;
-}
-
-.night-mode .post-details
-{
-  color: #aaa;
-}
-
-.night-mode .form-control
-{
-  background-color: #5c5c5c;
-	border: 1px solid #8c8c8c;
-	color: white;
-	font-size: 15px;
-}
-
-.night-mode .btn-default
-{
-  background-color: #363636;
-  border: 1px solid #8c8c8c;
-  border-left: none;
-  color: #dfdfdf;
-}
-
-.night-mode .btn-default:hover
-{
-  background-color: #2f2f2f;
-  color: white;
-}
-
-.night-mode .btn-default:hover:active
-{
-  background-color: #222;
-  border: 1px solid #999;
-  color: white;
-}
-
-.night-mode .btn-default:active
-{
-  background-color: #222;
-  border: 1px solid #999;
-  color: white;
-}
-
-.search-status
-{
-  text-align: center;
-}
-
-.night-mode .other-results
-{
-  color: #ccc;
-}
-
-.night-mode select.sort-options
-{
-  background-color: #333;
-  border-radius: 2px;
-  color: #ddd;
-}
-
-.night-mode option.sort-option:hover,
-.night-mode select.sort-options:hover
-{
-  background-color: #444;
-}
-
-.night-mode .sort-option
-{
-  color: #ccc;
-}
-
-.pre
-{
-  white-space: pre;
 }
