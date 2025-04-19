@@ -1,4 +1,4 @@
-import { getOptions, getCurrentTabUrl, navigateTo } from './chrome.js';
+import { getOptions, getCurrentTabUrl, getCurrentTabIndex, navigateTo } from './chrome.js';
 import { processUrl, isYoutubeUrl, getYoutubeVideoId } from './url.js';
 import { findOnReddit } from './reddit.js';
 import { popupDefaults } from './query.js';
@@ -39,7 +39,7 @@ function registerHandlers(opts) {
 		if (e.data.html) {
 			DOM.resultsDiv.html(e.data.html);
 		}
-		$('.sort-options').change(function() {
+		$('.sort-options').change(function () {
 			state.opts.orderBy = $(this).val();
 			displayPosts(state.lastResult.posts, state.lastResult.url);
 		});
@@ -51,7 +51,7 @@ function registerHandlers(opts) {
 	});
 
 	// open links in new tab - or not
-	$('body').on('click', 'a', function(e) {
+	$('body').on('click', 'a', function (e) {
 		let clickedUrl = $(this).attr('href');
 		if (e.metaKey || e.shiftKey || e.altKey) {
 			/* cmd/shift/alt + click: 
@@ -68,16 +68,28 @@ function registerHandlers(opts) {
 			// (2) the popup remains open (== preventDefault & stopPropagation)
 			return false;
 		} else if (opts.newtab) {
-			chrome.tabs.create({
-				url: clickedUrl,
-				active: !opts.newtabInBg
-			});
+			if (opts.newtabInBg && opts.newtabInBgAdjacent) {
+				getCurrentTabIndex()
+					.then(idx => {
+						chrome.tabs.create({
+							url: clickedUrl,
+							active: false,
+							index: idx + 1
+						});
+					})
+					.catch(console.log)
+			} else {
+				chrome.tabs.create({
+					url: clickedUrl,
+					active: !opts.newtabInBg
+				});
+			}
 		} else {
 			navigateTo(clickedUrl);
 		}
 	});
 
-	DOM.opts.ytCheckbox.change(function(e) {
+	DOM.opts.ytCheckbox.change(function (e) {
 		if (this.checked) {
 			setUiState('YT_VID');
 		} else {

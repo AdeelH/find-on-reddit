@@ -18,6 +18,7 @@ async function saveOptions() {
 		popup: {
 			newtab: DOM.opts.newtab.prop('checked'),
 			newtabInBg: DOM.opts.newtabInBg.prop('checked'),
+			newtabInBgAdjacent: DOM.opts.newtabInBgAdjacent.prop('checked'),
 			results: {
 				orderBy: DOM.opts.orderBy.val(),
 				desc: DOM.opts.orderDesc.prop('checked')
@@ -56,6 +57,7 @@ async function restoreOptions() {
 	// popup
 	DOM.opts.newtab.prop('checked', opts.popup.newtab);
 	DOM.opts.newtabInBg.prop('checked', opts.popup.newtabInBg);
+	DOM.opts.newtabInBgAdjacent.prop('checked', opts.popup.newtabInBgAdjacent);
 	DOM.opts.orderBy.val(opts.popup.results.orderBy);
 	DOM.opts.orderDesc.prop('checked', opts.popup.results.desc);
 
@@ -103,6 +105,7 @@ function fetchDomHandles() {
 			retryExact: $('#auto-retry-exact'),
 			newtab: $('#popup-newtab'),
 			newtabInBg: $('#popup-newtab-bg'),
+			newtabInBgAdjacent: $('#popup-newtab-bg-adjacent'),
 			cachePeriod: $('#cache-period'),
 			blacklist: $('#blacklist'),
 			orderBy: $('#order-by'),

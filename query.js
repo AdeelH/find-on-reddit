@@ -4,6 +4,7 @@ export const oldReddit = false;
 export const popupUi = {
 	newab: true,
 	newtabInBg: true,
+	newtabInBgAdjacent: false,
 	results: {
 		orderBy: 'score',
 		desc: true

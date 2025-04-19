@@ -4,6 +4,11 @@ export async function getCurrentTabUrl() {
 	return tab.url;
 }
 
+export async function getCurrentTabIndex() {
+	const tab = await getCurrentTab();
+	return tab.index;
+}
+
 export function getCurrentTab() {
 	const query = {
 		active: true,
