@@ -1,1 +1,4 @@
 *.zip
+
+# ignore files created by "Local History" VS Code extension
+.history/
