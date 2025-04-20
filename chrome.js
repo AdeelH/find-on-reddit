@@ -1,4 +1,3 @@
-
 export async function getCurrentTabUrl() {
 	const tab = await getCurrentTab();
 	return tab.url;
@@ -9,57 +8,49 @@ export async function getCurrentTabIndex() {
 	return tab.index;
 }
 
-export function getCurrentTab() {
-	const query = {
+export async function getCurrentTab() {
+	const tabs = await chrome.tabs.query({
 		active: true,
 		currentWindow: true
-	};
-	return new Promise((resolve, reject) => {
-		chrome.tabs.query(query, tabs => resolve(tabs[0]));
 	});
+	return tabs[0];
 }
 
-export function getTabById(tabId) {
-	return new Promise((resolve, reject) => {
-		chrome.tabs.get(tabId, resolve);
-	});
+export async function getTabById(tabId) {
+	const tab = await chrome.tabs.get(parseInt(tabId));
+	if (chrome.runtime.lastError) {
+		console.log(chrome.runtime.lastError);
+		throw Error(chrome.runtime.lastError);
+	}
+	return tab;
 }
 
 export async function navigateTo(url) {
 	const tab = await getCurrentTab();
 	if (!chrome.runtime.lastError) {
-		chrome.tabs.update(tab.id, { url: url });
+		await chrome.tabs.update(tab.id, { url: url });
 	}
 }
 
-export function searchCache(query) {
-	return new Promise((resolve, reject) => {
-		chrome.storage.local.get(query, resolve);
-	});
+export async function searchCache(query) {
+	return chrome.storage.local.get(query);
 }
 
-export function clearCache() {
-	return new Promise((resolve, reject) => {
-		chrome.storage.local.clear(resolve);
-	});
+export async function clearCache() {
+	await chrome.storage.local.clear();
 }
 
-export function cache(data) {
-	return new Promise((resolve, reject) => {
-		chrome.storage.local.set(data, resolve);
-	});
+export async function cache(data) {
+	await chrome.storage.local.set(data);
 }
 
-export function updateOptions(data) {
-	return new Promise((resolve, reject) => {
-		chrome.storage.sync.set({ options: data }, resolve);
-	});
+export async function updateOptions(data) {
+	await chrome.storage.sync.set({ options: data });
 }
 
-export function getOptions(query) {
-	return new Promise((resolve, reject) => {
-		chrome.storage.sync.get({ options: query }, data => resolve(data.options));
-	});
+export async function getOptions(query) {
+	const data = await chrome.storage.sync.get({ options: query });
+	return data.options;
 }
 
 export function ignoreRejection(...args) {
