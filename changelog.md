@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.6.0:
+- Make the options page dark themed, consistent with the popup (https://github.com/AdeelH/find-on-reddit/pull/51)
+  - Thanks nkmathew for the suggestion!
+- Add option for opening tab in background next to current tab instead of at the end (https://github.com/AdeelH/find-on-reddit/pull/52)
+  - Thanks nkmathew for the suggestion!
+- Fix problem w/ count of other kind of search not showing up plus general improvements (https://github.com/AdeelH/find-on-reddit/pull/53)
+- Add new option to do both exact and non-exact search with auto-search (https://github.com/AdeelH/find-on-reddit/pull/54)
+- Update dependencies (https://github.com/AdeelH/find-on-reddit/pull/56)
+
 ## v1.5.8:
 - Fix a bug causing links to not open in the same tab.
 
