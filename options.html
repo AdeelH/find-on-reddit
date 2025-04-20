@@ -101,7 +101,8 @@
 							<p>Note 1: If checked, <code>xyz.com</code> will <u>not</u> match <code>xyz.com/abc</code>,
 								<code>xyz.com/abc/def</code> etc.
 							</p>
-							<p>Note 2: Does not use Reddit's search API and is therefore faster and more reliable</p>
+							<p>Note 2: Uses Reddit API's "info" endpoint instead of the "search" endpoint and is
+								therefore faster and more reliable.</p>
 						</div>
 					</div>
 					<!-- ignore query-string -->
@@ -127,6 +128,30 @@
 			<!-- autorun -->
 			<h3 class="option-section-heading">Auto-search</h3>
 			<div class="form-group container">
+				<!-- Exact vs non-exact -->
+				<div class="option-desc">Exact vs non-exact</div>
+				<div class="container input-group">
+					<!-- non-exact if exact returns 0 results -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-exact">
+						<div class="option-checkbox-text col-xs-11">
+							Automaticaly do a non-exact search if exact search returns zero results
+						</div><br /><br />
+						<div class="notes">
+							<p>Note: Only applies to auto-search.</p>
+						</div>
+					</div>
+					<!-- always do both kinds of search -->
+					<div class="row option-checkbox-container">
+						<input class="col-xs-1 option-checkbox" type="checkbox" id="always-both-exact-and-nonexact">
+						<div class="option-checkbox-text col-xs-11">
+							Always automaticaly do both an exact search and a non-exact search.
+						</div><br /><br />
+						<div class="notes">
+							<p>Note: Only applies to auto-search.</p>
+						</div>
+					</div>
+				</div>
 				<!-- Search/re-search when -->
 				<div class="option-desc">When to run the search?</div>
 				<div class="container input-group">
@@ -152,16 +177,6 @@
 						<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-error">
 						<div class="option-checkbox-text col-xs-11">
 							Retry search (every 5 seconds) in case of server error. (Max attempts: 5)
-						</div>
-					</div>
-					<!-- retry on 0 results-->
-					<div class="row option-checkbox-container">
-						<input class="col-xs-1 option-checkbox" type="checkbox" id="auto-retry-exact">
-						<div class="option-checkbox-text col-xs-11">
-							Automaticaly do a non-exact search if exact search return zero results
-						</div><br /><br />
-						<div class="notes">
-							<p>Note: Only applies to auto-search.</p>
 						</div>
 					</div>
 				</div>

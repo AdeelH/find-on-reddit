@@ -73,8 +73,19 @@ async function autoSearch(tabId, url) {
 	let posts;
 	if (exactMatch) {
 		posts = await searchExact(tabId, urlToSearch);
+		if (bgOpts.autorun.retryExact && posts.length === 0) {
+			return searchNonExact(tabId, urlToSearch);
+		}
+		if (bgOpts.autorun.alwaysBothExactAndNonExact) {
+			// don't return, just save to cache
+			await searchNonExact(tabId, urlToSearch);
+		}
 	} else {
 		posts = await searchNonExact(tabId, urlToSearch);
+		if (bgOpts.autorun.alwaysBothExactAndNonExact && !isYt) {
+			// don't return, just save to cache
+			await searchExact(tabId, urlToSearch);
+		}
 	}
 	return setResultsBadge(tabId, posts);
 }
