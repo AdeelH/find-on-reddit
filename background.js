@@ -1,7 +1,7 @@
-import {clearCache, getTabById, getOptions, ignoreRejection} from './chrome.js';
-import {processUrl, removeQueryString, isYoutubeUrl} from './url.js';
-import {findOnReddit} from './reddit.js';
-import {bgOptions} from './query.js';
+import { clearCache, getTabById, getOptions, ignoreRejection } from './chrome.js';
+import { processUrl, removeQueryString, isYoutubeUrl } from './url.js';
+import { findOnReddit } from './reddit.js';
+import { bgOptions } from './query.js';
 
 
 const BADGE_COLORS = {
@@ -11,7 +11,7 @@ const BADGE_COLORS = {
 
 let bgOpts;
 
-// The respective listeneres will noop if these are false. This hack is needed
+// The respective listeners will noop if these are false. This hack is needed
 // because we can no longer restart the background page in v3.
 let tabUpdatedListenerActive = false;
 let tabActivatedListenerActive = false;
@@ -21,6 +21,7 @@ let tabActivatedListenerActive = false;
 let recentlyQueried = new Set([]);
 
 // this function seems to run only once in v3, which is fine
+// this CANNOT be async because "Top-level await is disallowed in service workers."
 (function init() {
 	// Avoid storage bloat. Ideally, this should happen on browser exit, 
 	// but the Chrome API doesn't provide an event for that.
@@ -168,7 +169,6 @@ async function setBadge(tabId, text, color) {
 	const badge = { text: text, tabId: tabId };
 	const bgCol = { color: color, tabId: tabId };
 	try {
-		const tab = await getTabById(tabId);
 		if (!chrome.runtime.lastError) {
 			chrome.action.setBadgeText(badge);
 		}
@@ -176,6 +176,7 @@ async function setBadge(tabId, text, color) {
 			chrome.action.setBadgeBackgroundColor(bgCol);
 		}
 	} catch (args) {
+		console.log(args);
 		return ignoreRejection(args);
 	}
 }
