@@ -85,7 +85,8 @@ async function searchExact(tabId, url, retryCount = 0) {
 		return;
 	}
 	try {
-		const posts = await findOnReddit(url, true, true)
+		const searchResults = await findOnReddit(url, true, true);
+		const posts = searchResults.posts;
 		if (bgOpts.autorun.retryExact && posts.length === 0) {
 			return searchNonExact(tabId, url);
 		}
@@ -103,7 +104,8 @@ async function searchNonExact(tabId, url, retryCount = 0) {
 		return;
 	}
 	try {
-		return findOnReddit(url, true, false);
+		const searchResults = await findOnReddit(url, true, false);
+		return searchResults.posts;
 	} catch (e) {
 		if (bgOpts.autorun.retryError) {
 			setTimeout(() => searchNonExact(tabId, url, retryCount + 1), BG_RETRY_INTERVAL);

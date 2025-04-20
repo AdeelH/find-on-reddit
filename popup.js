@@ -124,16 +124,14 @@ function render(userClicked = false) {
 
 			return findOnReddit(urlToSearch, useCache, exactMatch);
 		})
-		.then(posts => {
+		.then(searchResults => {
+			const posts = searchResults.posts;
 			state.lastResult.posts = posts;
 			state.lastResult.url = originalUrl;
 			displayPosts(posts, originalUrl);
-			return posts.other;
-		})
-		.then(otherResults => {
 			setUiState('SEARCH_END', {
 				name: (!exactMatch ? 'exact' : 'non-exact'),
-				num: otherResults
+				num: searchResults.other
 			});
 		})
 		.catch(e => onRequestError(e, userClicked));
