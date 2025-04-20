@@ -30,9 +30,10 @@ async function saveOptions() {
 			ytHandling: DOM.opts.ytHandling.prop('checked')
 		},
 		autorun: {
+			retryExact: DOM.opts.retryExact.prop('checked'),
+			alwaysBothExactAndNonExact: DOM.opts.alwaysBothExactAndNonExact.prop('checked'),
 			updated: DOM.opts.updated.prop('checked'),
 			activated: DOM.opts.activated.prop('checked'),
-			retryExact: DOM.opts.retryExact.prop('checked'),
 			retryError: DOM.opts.retryError.prop('checked'),
 			badgeContent: DOM.opts.badgeContent.val(),
 		},
@@ -67,9 +68,10 @@ async function restoreOptions() {
 	DOM.opts.ytHandling.prop('checked', opts.search.ytHandling);
 
 	// auto-search
+	DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
+	DOM.opts.alwaysBothExactAndNonExact.prop('checked', opts.autorun.alwaysBothExactAndNonExact);
 	DOM.opts.updated.prop('checked', opts.autorun.updated);
 	DOM.opts.activated.prop('checked', opts.autorun.activated);
-	DOM.opts.retryExact.prop('checked', opts.autorun.retryExact);
 	DOM.opts.retryError.prop('checked', opts.autorun.retryError);
 	DOM.opts.badgeContent.val(opts.autorun.badgeContent);
 
@@ -99,10 +101,11 @@ function fetchDomHandles() {
 			exactMatch: $('#exact'),
 			ignoreQs: $('#ignore-qs'),
 			ytHandling: $('#yt'),
+			retryExact: $('#auto-retry-exact'),
+			alwaysBothExactAndNonExact: $('#always-both-exact-and-nonexact'),
 			updated: $('#autorun-updated'),
 			activated: $('#autorun-activated'),
 			retryError: $('#auto-retry-error'),
-			retryExact: $('#auto-retry-exact'),
 			newtab: $('#popup-newtab'),
 			newtabInBg: $('#popup-newtab-bg'),
 			newtabInBgAdjacent: $('#popup-newtab-bg-adjacent'),
