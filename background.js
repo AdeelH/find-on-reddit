@@ -74,7 +74,7 @@ async function autoSearch(tabId, url) {
 	if (exactMatch) {
 		posts = await searchExact(tabId, urlToSearch);
 		if (bgOpts.autorun.retryExact && posts.length === 0) {
-			return searchNonExact(tabId, urlToSearch);
+			posts = await searchNonExact(tabId, urlToSearch);
 		}
 		if (bgOpts.autorun.alwaysBothExactAndNonExact) {
 			// don't return, just save to cache
