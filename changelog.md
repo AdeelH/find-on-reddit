@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.6.0:
+## v1.6.1:
 - Make the options page dark themed, consistent with the popup (https://github.com/AdeelH/find-on-reddit/pull/51)
   - Thanks nkmathew for the suggestion!
 - Add option for opening tab in background next to current tab instead of at the end (https://github.com/AdeelH/find-on-reddit/pull/52)
