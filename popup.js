@@ -2,6 +2,7 @@ import { getOptions, getCurrentTabUrl, getCurrentTabIndex, navigateTo } from './
 import { processUrl, isYoutubeUrl, getYoutubeVideoId } from './url.js';
 import { findOnReddit } from './reddit.js';
 import { popupDefaults } from './query.js';
+import { calcAge } from './utils.js';
 
 // DOM handles
 let DOM;
@@ -170,24 +171,6 @@ function onRequestError(error, userClicked = false) {
 	setTimeout(() => onRequestError(error, userClicked), 1e3);
 }
 
-/* post age calculation */
-const timeUnits = [
-	{ factor: 1 / (1e3), name: 'seconds', decis: 0 },
-	{ factor: 1 / (1e3 * 60), name: 'minutes', decis: 0 },
-	{ factor: 1 / (1e3 * 60 * 60), name: 'hours', decis: 0 },
-	{ factor: 1 / (1e3 * 60 * 60 * 24), name: 'days', decis: 0 },
-	{ factor: 1 / (1e3 * 60 * 60 * 24 * 30), name: 'months', decis: 0 },
-	{ factor: 1 / (1e3 * 60 * 60 * 24 * 30 * 12), name: 'years', decis: 1 }
-];
-function calcAge(timestampSeconds) {
-	let diffMillis = Date.now() - (timestampSeconds * 1e3);
-	let [n, unit] = timeUnits
-		.map(t => [+(diffMillis * t.factor).toFixed(t.decis), t.name])
-		.reverse()
-		.find(([n, u]) => n >= 1);
-	unit = (n === 1) ? unit.slice(0, -1) : unit; // singular/plural
-	return `${n} ${unit}`;
-}
 
 /* UI */
 let fieldMappings = Object.freeze({
