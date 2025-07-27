@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.2:
+- Slightly tweak how post ages are displayed:
+  - Use "days ago" for posts that are not older than 60 days.
+  - Round number of months to nearest 0.5. E.g. "1.5 months ago".
+- Re-format code using the Prettier formatter.
+
 ## v1.6.1:
 - Make the options page dark themed, consistent with the popup (https://github.com/AdeelH/find-on-reddit/pull/51)
   - Thanks nkmathew for the suggestion!
