@@ -11,7 +11,7 @@ export function removeQueryString(url) {
 
 /* Youtube video handling */
 export const YT_REGEX =
-    /^https?:\/\/(?:www\.|m\.|)?youtu(?:\.be|be\.com)\/(?:embed\/|v\/|watch\?(?:.+&)*v=)?([\w-_]{11})/i;
+    /^https?:\/\/(?:www\.|m\.|)?youtu(?:\.be|be\.com)\/(?:embed\/|v\/|live\/|watch\?(?:.+&)*v=)?([\w-_]{11})/i;
 export const DASHES_REGEX = /^-*(.*)/i;
 
 export function isYoutubeUrl(url) {
