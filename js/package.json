@@ -1,6 +1,6 @@
 {
     "name": "find-on-reddit",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "dependencies": {
         "bootstrap": "3.4.1",
         "handlebars": "4.7.8",

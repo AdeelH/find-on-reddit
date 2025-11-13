@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.3:
+- Handle /live/ YouTube URLS
+
 ## v1.6.2:
 - Slightly tweak how post ages are displayed:
   - Use "days ago" for posts that are not older than 60 days.
