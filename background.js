@@ -24,12 +24,12 @@ let tabActivatedListenerActive = false;
 // as the tab goes through different states while loading.
 let recentlyQueried = new Set([]);
 
-// this function seems to run only once in v3, which is fine
+// Runs on every service worker start, which happens frequently in v3.
 // this CANNOT be async because "Top-level await is disallowed in service workers."
 (function init() {
     // Avoid storage bloat. Ideally, this should happen on browser exit,
     // but the Chrome API doesn't provide an event for that.
-    clearCache();
+    chrome.runtime.onStartup.addListener(clearCache);
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
     updateListenerFlags();
