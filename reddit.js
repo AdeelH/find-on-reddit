@@ -3,7 +3,7 @@ import { DEFAULT_CACHE_PERIOD_MINS } from "./query.js";
 
 export const SEARCH_API =
     "https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:";
-export const INFO_API = "https://reddit.com/api/info.json?url=";
+export const INFO_API = "https://www.reddit.com/api/info.json?url=";
 export const DUPLICATES_API = "https://api.reddit.com/duplicates/";
 
 export async function findOnReddit(url, useCache = true, exact = true) {
@@ -80,7 +80,8 @@ export async function get_duplicates_for_id(post_id) {
 }
 
 export async function makeApiRequest(url) {
-    const res = await fetch(url);
+    // Public endpoints; don't attach the user's Reddit session to automated lookups.
+    const res = await fetch(url, { credentials: "omit" });
     if (!res.ok) {
         throw await buildResponseError(res);
     }
