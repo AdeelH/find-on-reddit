@@ -172,7 +172,10 @@ let retryTimer = null;
 function onRequestError(error, userClicked = false) {
     console.log(error);
     if (error.retryable === false) {
-        setUiState("AJAX_ERROR_FATAL", { msg: error.message });
+        setUiState("AJAX_ERROR_FATAL", {
+            msg: error.message,
+            helpUrl: error.helpUrl,
+        });
         return;
     }
     if (retryAttempt >= MAX_RETRIES) {
@@ -291,6 +294,14 @@ function setUiState(state, params = null) {
         }
         case "AJAX_ERROR_FATAL": {
             DOM.statusDiv.text(params.msg);
+            if (params.helpUrl) {
+                DOM.statusDiv.append(
+                    " ",
+                    $("<a>")
+                        .attr("href", params.helpUrl)
+                        .text("File a ticket with Reddit"),
+                );
+            }
             break;
         }
         case "YT_VID": {
