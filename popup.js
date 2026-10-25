@@ -155,7 +155,7 @@ function getUrl() {
     if (urlInput) {
         return Promise.resolve(urlInput);
     } else {
-        let urlPromise = getCurrentTabUrl(url);
+        let urlPromise = getCurrentTabUrl();
         urlPromise.then((url) => DOM.urlInput.val(url));
         return urlPromise;
     }
