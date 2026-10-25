@@ -2,7 +2,7 @@
 export const oldReddit = false;
 
 export const popupUi = {
-    newab: true,
+    newtab: true,
     newtabInBg: true,
     newtabInBgAdjacent: false,
     results: {
