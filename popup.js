@@ -171,6 +171,10 @@ let retryAttempt = 0;
 let retryTimer = null;
 function onRequestError(error, userClicked = false) {
     console.log(error);
+    if (error.retryable === false) {
+        setUiState("AJAX_ERROR_FATAL", { msg: error.message });
+        return;
+    }
     if (retryAttempt >= MAX_RETRIES) {
         setUiState("AJAX_ERROR_FINAL", { msg: error.message });
         return;
@@ -283,6 +287,10 @@ function setUiState(state, params = null) {
             DOM.statusDiv.text(
                 `${params.msg}, giving up after ${MAX_RETRIES} retries. Click search to try again.`,
             );
+            break;
+        }
+        case "AJAX_ERROR_FATAL": {
+            DOM.statusDiv.text(params.msg);
             break;
         }
         case "YT_VID": {

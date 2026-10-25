@@ -82,24 +82,34 @@ export async function get_duplicates_for_id(post_id) {
 export async function makeApiRequest(url) {
     const res = await fetch(url);
     if (!res.ok) {
-        throw new Error(await describeErrorResponse(res));
+        throw await buildResponseError(res);
     }
     return res.json();
 }
 
-async function describeErrorResponse(res) {
+async function buildResponseError(res) {
+    const text = await res.text().catch(() => "");
+    if (/blocked by network security/i.test(text)) {
+        const error = new Error(
+            "Blocked by Reddit's network security. This can happen on a VPN or proxy.",
+        );
+        error.retryable = false;
+        return error;
+    }
     // Reddit error bodies look like {"message", "error", "reason"?, "explanation"?}
     let body = {};
     try {
-        body = (await res.json()) ?? {};
+        body = JSON.parse(text) ?? {};
     } catch (e) {
-        // non-JSON body, e.g. an HTML block page
+        // non-JSON body
     }
     const summary = body.message || res.statusText;
     const detail = body.explanation || body.reason;
-    return [res.status, summary, detail && `(${detail})`]
-        .filter(Boolean)
-        .join(" ");
+    return new Error(
+        [res.status, summary, detail && `(${detail})`]
+            .filter(Boolean)
+            .join(" "),
+    );
 }
 
 export async function cachePosts(query, posts, exact) {

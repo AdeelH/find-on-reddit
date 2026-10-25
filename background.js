@@ -94,7 +94,11 @@ async function autoSearch(tabId, url, retryCount = 0) {
         }
     } catch (e) {
         await handleError(e, tabId);
-        if (bgOpts.autorun.retryError && retryCount + 1 < MAX_RETRIES) {
+        if (
+            bgOpts.autorun.retryError &&
+            e.retryable !== false &&
+            retryCount + 1 < MAX_RETRIES
+        ) {
             setTimeout(
                 () => autoSearch(tabId, url, retryCount + 1),
                 BG_RETRY_INTERVAL,
