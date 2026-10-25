@@ -4,12 +4,8 @@
     <div class="row num-results-container">
       <div class="num-results col-xs-6 text-left">
         <span class="pre">{{numPosts}} {{#pluralize "result" numPosts}}{{/pluralize}}  |  </span>
-        <a href="https://{{#if oldReddit}}old.{{/if}}reddit.com/submit?url={{url}}
-        {{#if numPosts}}
-          &resubmit=true">repost to Reddit
-        {{else}}
-          ">post to Reddit
-        {{/if}}
+        <a href="https://{{#if oldReddit}}old.{{/if}}reddit.com/submit?url={{encode url}}{{#if numPosts}}&resubmit=true{{/if}}">
+          {{#if numPosts}}repost{{else}}post{{/if}} to Reddit
         <span class="glyphicon glyphicon-share-alt"></span></a>
       </div>
       <div class="col-xs-6">
@@ -76,6 +72,10 @@
 
   Handlebars.registerHelper('pluralize', function (str, n) {
     return `${str}${n != 1 ? 's' : ''}`;
+  });
+
+  Handlebars.registerHelper('encode', function (str) {
+    return encodeURIComponent(str);
   });
 
   let template = Handlebars.compile($('#search-results-template').html());
