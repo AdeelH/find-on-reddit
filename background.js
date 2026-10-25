@@ -32,7 +32,40 @@ let recentlyQueried = new Set([]);
     chrome.runtime.onStartup.addListener(clearCache);
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
+    setUserAgentRule().catch(console.log);
 })();
+
+const USER_AGENT_RULE_ID = 1;
+
+// fetch() can't override User-Agent, so rewrite it on the extension's own requests to Reddit.
+// tabIds is only supported for session rules; those survive service worker restarts but not browser restarts.
+async function setUserAgentRule() {
+    const version = chrome.runtime.getManifest().version;
+    await chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [USER_AGENT_RULE_ID],
+        addRules: [
+            {
+                id: USER_AGENT_RULE_ID,
+                priority: 1,
+                action: {
+                    type: "modifyHeaders",
+                    requestHeaders: [
+                        {
+                            header: "User-Agent",
+                            operation: "set",
+                            value: `chrome-extension:find-on-reddit:${version}`,
+                        },
+                    ],
+                },
+                condition: {
+                    requestDomains: ["reddit.com"],
+                    tabIds: [chrome.tabs.TAB_ID_NONE],
+                    resourceTypes: ["xmlhttprequest"],
+                },
+            },
+        ],
+    });
+}
 
 async function updateListenerFlags() {
     const opts = await getOptions(bgOptions);
