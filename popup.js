@@ -110,7 +110,11 @@ function registerHandlers(opts) {
     DOM.searchBtn.click(() => render(true));
 }
 
-function render(userClicked = false) {
+function render(userClicked = false, isRetry = false) {
+    clearTimeout(retryTimer);
+    if (!isRetry) {
+        retryAttempt = 0;
+    }
     setUiState("SEARCH_BEGIN");
     let urlPromise = getUrl();
     let params = getSearchParams();
@@ -161,18 +165,32 @@ function getUrl() {
     }
 }
 
-const AJAX_RETRY_DELAY_SEC = 5;
-let retry_countdown = AJAX_RETRY_DELAY_SEC;
+const MAX_RETRIES = 5;
+const RETRY_BASE_DELAY_SEC = 2;
+let retryAttempt = 0;
+let retryTimer = null;
 function onRequestError(error, userClicked = false) {
     console.log(error);
-    if (retry_countdown == 0) {
-        retry_countdown = AJAX_RETRY_DELAY_SEC;
-        render(userClicked);
+    if (retryAttempt >= MAX_RETRIES) {
+        setUiState("AJAX_ERROR_FINAL", { msg: error.message });
         return;
     }
-    retry_countdown -= 1;
-    setUiState("AJAX_ERROR", { msg: error.message, delay: retry_countdown });
-    setTimeout(() => onRequestError(error, userClicked), 1e3);
+    // exponential backoff: 2, 4, 8, 16, 32s
+    const delay = RETRY_BASE_DELAY_SEC * 2 ** retryAttempt;
+    retryAttempt += 1;
+    retryCountdown(delay, error.message, userClicked);
+}
+
+function retryCountdown(secondsLeft, msg, userClicked) {
+    if (secondsLeft <= 0) {
+        render(userClicked, true);
+        return;
+    }
+    setUiState("AJAX_ERROR", { msg: msg, delay: secondsLeft });
+    retryTimer = setTimeout(
+        () => retryCountdown(secondsLeft - 1, msg, userClicked),
+        1e3,
+    );
 }
 
 /* UI */
@@ -257,6 +275,13 @@ function setUiState(state, params = null) {
             params.msg = params.msg || "error";
             DOM.statusDiv.text(
                 `${params.msg}, retrying in ${params.delay}s ...`,
+            );
+            break;
+        }
+        case "AJAX_ERROR_FINAL": {
+            params.msg = params.msg || "error";
+            DOM.statusDiv.text(
+                `${params.msg}, giving up after ${MAX_RETRIES} retries. Click search to try again.`,
             );
             break;
         }
