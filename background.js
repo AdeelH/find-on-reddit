@@ -32,7 +32,6 @@ let recentlyQueried = new Set([]);
     chrome.runtime.onStartup.addListener(clearCache);
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
-    updateListenerFlags();
 })();
 
 async function updateListenerFlags() {
@@ -43,21 +42,21 @@ async function updateListenerFlags() {
 }
 
 async function tabUpdatedListener(tabId, info, tab) {
-    updateListenerFlags();
-    if (!tabUpdatedListenerActive) {
-        return;
-    }
     if (recentlyQueried.has(tab.url)) {
         return;
     }
     recentlyQueried.add(tab.url);
     setTimeout(() => recentlyQueried.delete(tab.url), 1e3);
+    await updateListenerFlags();
+    if (!tabUpdatedListenerActive) {
+        return;
+    }
     await removeBadge(tabId);
     return autoSearch(tabId, tab.url);
 }
 
 async function tabActivatedListener(activeInfo) {
-    updateListenerFlags();
+    await updateListenerFlags();
     if (!tabActivatedListenerActive) {
         return;
     }
