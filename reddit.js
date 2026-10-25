@@ -82,9 +82,24 @@ export async function get_duplicates_for_id(post_id) {
 export async function makeApiRequest(url) {
     const res = await fetch(url);
     if (!res.ok) {
-        throw new Error(`${res.status} ${res.statusText}`.trim());
+        throw new Error(await describeErrorResponse(res));
     }
     return res.json();
+}
+
+async function describeErrorResponse(res) {
+    // Reddit error bodies look like {"message", "error", "reason"?, "explanation"?}
+    let body = {};
+    try {
+        body = (await res.json()) ?? {};
+    } catch (e) {
+        // non-JSON body, e.g. an HTML block page
+    }
+    const summary = body.message || res.statusText;
+    const detail = body.explanation || body.reason;
+    return [res.status, summary, detail && `(${detail})`]
+        .filter(Boolean)
+        .join(" ");
 }
 
 export async function cachePosts(query, posts, exact) {
