@@ -24,6 +24,8 @@ let tabActivatedListenerActive = false;
 // as the tab goes through different states while loading.
 let recentlyQueried = new Set([]);
 
+const USER_AGENT_RULE_ID = 1;
+
 // Runs on every service worker start, which happens frequently in v3.
 // this CANNOT be async because "Top-level await is disallowed in service workers."
 (function init() {
@@ -34,8 +36,6 @@ let recentlyQueried = new Set([]);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
     setUserAgentRule().catch(console.log);
 })();
-
-const USER_AGENT_RULE_ID = 1;
 
 // fetch() can't override User-Agent, so rewrite it on the extension's own requests to Reddit.
 // tabIds is only supported for session rules; those survive service worker restarts but not browser restarts.
