@@ -121,7 +121,14 @@ function isAllowed(url) {
 }
 
 function isBlackListed(url) {
-    return bgOpts.blacklist.some((s) => url.search(s) > -1);
+    return bgOpts.blacklist.some((s) => {
+        try {
+            return url.search(s) > -1;
+        } catch (e) {
+            // invalid regex
+            return false;
+        }
+    });
 }
 
 async function handleError(e, tabId) {
