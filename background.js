@@ -1,9 +1,4 @@
-import {
-    clearCache,
-    getTabById,
-    getOptions,
-    ignoreRejection,
-} from "./chrome.js";
+import { clearCache, getTabById, getOptions } from "./chrome.js";
 import { processUrl, removeQueryString, isYoutubeUrl } from "./url.js";
 import { findOnReddit } from "./reddit.js";
 import { bgOptions } from "./query.js";
@@ -94,7 +89,13 @@ async function tabActivatedListener(activeInfo) {
         return;
     }
     const tabId = activeInfo.tabId;
-    const tab = await getTabById(tabId);
+    let tab;
+    try {
+        tab = await getTabById(tabId);
+    } catch (e) {
+        // tab was closed right after being activated
+        return;
+    }
     return autoSearch(tabId, tab.url);
 }
 
@@ -213,17 +214,13 @@ async function removeBadge(tabId) {
 }
 
 async function setBadge(tabId, text, color) {
-    const badge = { text: text, tabId: tabId };
-    const bgCol = { color: color, tabId: tabId };
     try {
-        if (!chrome.runtime.lastError) {
-            chrome.action.setBadgeText(badge);
-        }
-        if (!chrome.runtime.lastError) {
-            chrome.action.setBadgeBackgroundColor(bgCol);
-        }
-    } catch (args) {
-        console.log(args);
-        return ignoreRejection(args);
+        await chrome.action.setBadgeText({ text: text, tabId: tabId });
+        await chrome.action.setBadgeBackgroundColor({
+            color: color,
+            tabId: tabId,
+        });
+    } catch (e) {
+        // tab was closed before the search finished
     }
 }
