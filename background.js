@@ -65,7 +65,9 @@ async function tabActivatedListener(activeInfo) {
     return autoSearch(tabId, tab.url);
 }
 
-async function autoSearch(tabId, url) {
+const BG_RETRY_INTERVAL = 5e3;
+const MAX_RETRIES = 5;
+async function autoSearch(tabId, url, retryCount = 0) {
     if (!isAllowed(removeQueryString(url))) {
         return;
     }
@@ -73,65 +75,44 @@ async function autoSearch(tabId, url) {
     const exactMatch = bgOpts.search.exactMatch && !isYt;
     const urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
     let posts;
-    if (exactMatch) {
-        posts = await searchExact(tabId, urlToSearch);
-        if (bgOpts.autorun.retryExact && posts.length === 0) {
-            posts = await searchNonExact(tabId, urlToSearch);
+    try {
+        if (exactMatch) {
+            posts = await searchExact(urlToSearch);
+            if (bgOpts.autorun.retryExact && posts.length === 0) {
+                posts = await searchNonExact(urlToSearch);
+            }
+            if (bgOpts.autorun.alwaysBothExactAndNonExact) {
+                // don't return, just save to cache
+                await searchNonExact(urlToSearch);
+            }
+        } else {
+            posts = await searchNonExact(urlToSearch);
+            if (bgOpts.autorun.alwaysBothExactAndNonExact && !isYt) {
+                // don't return, just save to cache
+                await searchExact(urlToSearch);
+            }
         }
-        if (bgOpts.autorun.alwaysBothExactAndNonExact) {
-            // don't return, just save to cache
-            await searchNonExact(tabId, urlToSearch);
+    } catch (e) {
+        await handleError(e, tabId);
+        if (bgOpts.autorun.retryError && retryCount + 1 < MAX_RETRIES) {
+            setTimeout(
+                () => autoSearch(tabId, url, retryCount + 1),
+                BG_RETRY_INTERVAL,
+            );
         }
-    } else {
-        posts = await searchNonExact(tabId, urlToSearch);
-        if (bgOpts.autorun.alwaysBothExactAndNonExact && !isYt) {
-            // don't return, just save to cache
-            await searchExact(tabId, urlToSearch);
-        }
+        return;
     }
     return setResultsBadge(tabId, posts);
 }
 
-const BG_RETRY_INTERVAL = 5e3;
-const MAX_RETRIES = 5;
-async function searchExact(tabId, url, retryCount = 0) {
-    if (retryCount >= MAX_RETRIES) {
-        return;
-    }
-    try {
-        const searchResults = await findOnReddit(url, true, true);
-        const posts = searchResults.posts;
-        if (bgOpts.autorun.retryExact && posts.length === 0) {
-            return searchNonExact(tabId, url);
-        }
-        return posts;
-    } catch (e) {
-        if (bgOpts.autorun.retryError) {
-            setTimeout(
-                () => searchExact(tabId, url, retryCount + 1),
-                BG_RETRY_INTERVAL,
-            );
-        }
-        await handleError(e, tabId);
-    }
+async function searchExact(url) {
+    const searchResults = await findOnReddit(url, true, true);
+    return searchResults.posts;
 }
 
-async function searchNonExact(tabId, url, retryCount = 0) {
-    if (retryCount >= MAX_RETRIES) {
-        return;
-    }
-    try {
-        const searchResults = await findOnReddit(url, true, false);
-        return searchResults.posts;
-    } catch (e) {
-        if (bgOpts.autorun.retryError) {
-            setTimeout(
-                () => searchNonExact(tabId, url, retryCount + 1),
-                BG_RETRY_INTERVAL,
-            );
-        }
-        await handleError(e, tabId);
-    }
+async function searchNonExact(url) {
+    const searchResults = await findOnReddit(url, true, false);
+    return searchResults.posts;
 }
 
 function isAllowed(url) {
