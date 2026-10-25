@@ -171,7 +171,7 @@ function onRequestError(error, userClicked = false) {
         return;
     }
     retry_countdown -= 1;
-    setUiState("AJAX_ERROR", { msg: error.statusText, delay: retry_countdown });
+    setUiState("AJAX_ERROR", { msg: error.message, delay: retry_countdown });
     setTimeout(() => onRequestError(error, userClicked), 1e3);
 }
 

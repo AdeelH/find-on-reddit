@@ -81,6 +81,9 @@ export async function get_duplicates_for_id(post_id) {
 
 export async function makeApiRequest(url) {
     const res = await fetch(url);
+    if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`.trim());
+    }
     return res.json();
 }
 
