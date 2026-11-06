@@ -12,6 +12,23 @@ body
   padding: 20px;
 }
 
+.notice
+{
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.notice h4
+{
+  margin-top: 0;
+  color: #F0A500;
+}
+
+.search-disabled
+{
+  opacity: 0.5;
+}
+
 .num-results-container
 {
   padding-left: 5px;

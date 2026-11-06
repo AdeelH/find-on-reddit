@@ -46,7 +46,7 @@ export function calcAge(timestampSeconds) {
         .find(([val, t]) => val >= t.min_value);
     const val_rounded = roundToNearest(val, timeUnit.precision);
     // singular/plural
-    const unit = val === 1 ? timeUnit.name.slice(0, -1) : timeUnit.name;
+    const unit = val_rounded === 1 ? timeUnit.name.slice(0, -1) : timeUnit.name;
     return `${val_rounded} ${unit}`;
 }
 

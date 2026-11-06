@@ -1,16 +1,12 @@
-import {
-    clearCache,
-    getTabById,
-    getOptions,
-    ignoreRejection,
-} from "./chrome.js";
+import { clearCache, getTabById, getOptions } from "./chrome.js";
 import { processUrl, removeQueryString, isYoutubeUrl } from "./url.js";
-import { findOnReddit } from "./reddit.js";
+import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
 import { bgOptions } from "./query.js";
 
 const BADGE_COLORS = {
     error: "#DD1616",
     success: "#555555",
+    notice: "#F0A500",
 };
 
 let bgOpts;
@@ -24,16 +20,61 @@ let tabActivatedListenerActive = false;
 // as the tab goes through different states while loading.
 let recentlyQueried = new Set([]);
 
-// this function seems to run only once in v3, which is fine
+const USER_AGENT_RULE_ID = 1;
+
+// Runs on every service worker start, which happens frequently in v3.
 // this CANNOT be async because "Top-level await is disallowed in service workers."
 (function init() {
     // Avoid storage bloat. Ideally, this should happen on browser exit,
     // but the Chrome API doesn't provide an event for that.
-    clearCache();
+    chrome.runtime.onStartup.addListener(clearCache);
+    if (SEARCH_DISABLED) {
+        showUnavailableBadge().catch(console.log);
+        return;
+    }
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
-    updateListenerFlags();
+    setUserAgentRule().catch(console.log);
 })();
+
+// Global (not per-tab) so it shows on every tab without any tab events.
+async function showUnavailableBadge() {
+    await chrome.action.setBadgeText({ text: "!" });
+    await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLORS.notice });
+    await chrome.action.setTitle({
+        title: "Find on Reddit: search is currently unavailable. Click for details.",
+    });
+}
+
+// fetch() can't override User-Agent, so rewrite it on the extension's own requests to Reddit.
+// tabIds is only supported for session rules; those survive service worker restarts but not browser restarts.
+async function setUserAgentRule() {
+    const version = chrome.runtime.getManifest().version;
+    await chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [USER_AGENT_RULE_ID],
+        addRules: [
+            {
+                id: USER_AGENT_RULE_ID,
+                priority: 1,
+                action: {
+                    type: "modifyHeaders",
+                    requestHeaders: [
+                        {
+                            header: "User-Agent",
+                            operation: "set",
+                            value: `chrome-extension:find-on-reddit:${version}`,
+                        },
+                    ],
+                },
+                condition: {
+                    requestDomains: ["reddit.com"],
+                    tabIds: [chrome.tabs.TAB_ID_NONE],
+                    resourceTypes: ["xmlhttprequest"],
+                },
+            },
+        ],
+    });
+}
 
 async function updateListenerFlags() {
     const opts = await getOptions(bgOptions);
@@ -43,30 +84,38 @@ async function updateListenerFlags() {
 }
 
 async function tabUpdatedListener(tabId, info, tab) {
-    updateListenerFlags();
-    if (!tabUpdatedListenerActive) {
-        return;
-    }
     if (recentlyQueried.has(tab.url)) {
         return;
     }
     recentlyQueried.add(tab.url);
     setTimeout(() => recentlyQueried.delete(tab.url), 1e3);
+    await updateListenerFlags();
+    if (!tabUpdatedListenerActive) {
+        return;
+    }
     await removeBadge(tabId);
     return autoSearch(tabId, tab.url);
 }
 
 async function tabActivatedListener(activeInfo) {
-    updateListenerFlags();
+    await updateListenerFlags();
     if (!tabActivatedListenerActive) {
         return;
     }
     const tabId = activeInfo.tabId;
-    const tab = await getTabById(tabId);
+    let tab;
+    try {
+        tab = await getTabById(tabId);
+    } catch (e) {
+        // tab was closed right after being activated
+        return;
+    }
     return autoSearch(tabId, tab.url);
 }
 
-async function autoSearch(tabId, url) {
+const BG_RETRY_INTERVAL = 5e3;
+const MAX_RETRIES = 5;
+async function autoSearch(tabId, url, retryCount = 0) {
     if (!isAllowed(removeQueryString(url))) {
         return;
     }
@@ -74,65 +123,48 @@ async function autoSearch(tabId, url) {
     const exactMatch = bgOpts.search.exactMatch && !isYt;
     const urlToSearch = processUrl(url, bgOpts.search.ignoreQs, isYt);
     let posts;
-    if (exactMatch) {
-        posts = await searchExact(tabId, urlToSearch);
-        if (bgOpts.autorun.retryExact && posts.length === 0) {
-            posts = await searchNonExact(tabId, urlToSearch);
+    try {
+        if (exactMatch) {
+            posts = await searchExact(urlToSearch);
+            if (bgOpts.autorun.retryExact && posts.length === 0) {
+                posts = await searchNonExact(urlToSearch);
+            }
+            if (bgOpts.autorun.alwaysBothExactAndNonExact) {
+                // don't return, just save to cache
+                await searchNonExact(urlToSearch);
+            }
+        } else {
+            posts = await searchNonExact(urlToSearch);
+            if (bgOpts.autorun.alwaysBothExactAndNonExact && !isYt) {
+                // don't return, just save to cache
+                await searchExact(urlToSearch);
+            }
         }
-        if (bgOpts.autorun.alwaysBothExactAndNonExact) {
-            // don't return, just save to cache
-            await searchNonExact(tabId, urlToSearch);
+    } catch (e) {
+        await handleError(e, tabId);
+        if (
+            bgOpts.autorun.retryError &&
+            e.retryable !== false &&
+            retryCount + 1 < MAX_RETRIES
+        ) {
+            setTimeout(
+                () => autoSearch(tabId, url, retryCount + 1),
+                BG_RETRY_INTERVAL,
+            );
         }
-    } else {
-        posts = await searchNonExact(tabId, urlToSearch);
-        if (bgOpts.autorun.alwaysBothExactAndNonExact && !isYt) {
-            // don't return, just save to cache
-            await searchExact(tabId, urlToSearch);
-        }
+        return;
     }
     return setResultsBadge(tabId, posts);
 }
 
-const BG_RETRY_INTERVAL = 5e3;
-const MAX_RETRIES = 5;
-async function searchExact(tabId, url, retryCount = 0) {
-    if (retryCount >= MAX_RETRIES) {
-        return;
-    }
-    try {
-        const searchResults = await findOnReddit(url, true, true);
-        const posts = searchResults.posts;
-        if (bgOpts.autorun.retryExact && posts.length === 0) {
-            return searchNonExact(tabId, url);
-        }
-        return posts;
-    } catch (e) {
-        if (bgOpts.autorun.retryError) {
-            setTimeout(
-                () => searchExact(tabId, url, retryCount + 1),
-                BG_RETRY_INTERVAL,
-            );
-        }
-        await handleError(e, tabId);
-    }
+async function searchExact(url) {
+    const searchResults = await findOnReddit(url, true, true);
+    return searchResults.posts;
 }
 
-async function searchNonExact(tabId, url, retryCount = 0) {
-    if (retryCount >= MAX_RETRIES) {
-        return;
-    }
-    try {
-        const searchResults = await findOnReddit(url, true, false);
-        return searchResults.posts;
-    } catch (e) {
-        if (bgOpts.autorun.retryError) {
-            setTimeout(
-                () => searchNonExact(tabId, url, retryCount + 1),
-                BG_RETRY_INTERVAL,
-            );
-        }
-        await handleError(e, tabId);
-    }
+async function searchNonExact(url) {
+    const searchResults = await findOnReddit(url, true, false);
+    return searchResults.posts;
 }
 
 function isAllowed(url) {
@@ -141,7 +173,14 @@ function isAllowed(url) {
 }
 
 function isBlackListed(url) {
-    return bgOpts.blacklist.some((s) => url.search(s) > -1);
+    return bgOpts.blacklist.some((s) => {
+        try {
+            return url.search(s) > -1;
+        } catch (e) {
+            // invalid regex
+            return false;
+        }
+    });
 }
 
 async function handleError(e, tabId) {
@@ -189,17 +228,13 @@ async function removeBadge(tabId) {
 }
 
 async function setBadge(tabId, text, color) {
-    const badge = { text: text, tabId: tabId };
-    const bgCol = { color: color, tabId: tabId };
     try {
-        if (!chrome.runtime.lastError) {
-            chrome.action.setBadgeText(badge);
-        }
-        if (!chrome.runtime.lastError) {
-            chrome.action.setBadgeBackgroundColor(bgCol);
-        }
-    } catch (args) {
-        console.log(args);
-        return ignoreRejection(args);
+        await chrome.action.setBadgeText({ text: text, tabId: tabId });
+        await chrome.action.setBadgeBackgroundColor({
+            color: color,
+            tabId: tabId,
+        });
+    } catch (e) {
+        // tab was closed before the search finished
     }
 }

@@ -1,9 +1,12 @@
 import { getOptions, searchCache, cache } from "./chrome.js";
 import { DEFAULT_CACHE_PERIOD_MINS } from "./query.js";
 
+// Reddit now blocks unapproved API access; see https://github.com/AdeelH/find-on-reddit/issues/59
+export const SEARCH_DISABLED = true;
+
 export const SEARCH_API =
     "https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:";
-export const INFO_API = "https://reddit.com/api/info.json?url=";
+export const INFO_API = "https://www.reddit.com/api/info.json?url=";
 export const DUPLICATES_API = "https://api.reddit.com/duplicates/";
 
 export async function findOnReddit(url, useCache = true, exact = true) {
@@ -80,8 +83,63 @@ export async function get_duplicates_for_id(post_id) {
 }
 
 export async function makeApiRequest(url) {
-    const res = await fetch(url);
+    // Public endpoints; don't attach the user's Reddit session to automated lookups.
+    const res = await fetch(url, { credentials: "omit" });
+    if (!res.ok) {
+        throw await buildResponseError(res);
+    }
     return res.json();
+}
+
+const REDDIT_TICKET_URL =
+    "https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=21879292693140";
+
+function findTicketUrl(html) {
+    // DOMParser is unavailable in the service worker; it never runs scripts or loads resources.
+    if (typeof DOMParser === "undefined") {
+        return REDDIT_TICKET_URL;
+    }
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    for (const a of doc.querySelectorAll("a[href]")) {
+        try {
+            const url = new URL(a.getAttribute("href"));
+            if (
+                url.protocol === "https:" &&
+                url.hostname === "support.reddithelp.com"
+            ) {
+                return url.href;
+            }
+        } catch (e) {
+            // not an absolute URL
+        }
+    }
+    return REDDIT_TICKET_URL;
+}
+
+async function buildResponseError(res) {
+    const text = await res.text().catch(() => "");
+    if (/blocked by network security/i.test(text)) {
+        const error = new Error(
+            "Blocked by Reddit's network security. This can happen on a VPN or proxy.",
+        );
+        error.retryable = false;
+        error.helpUrl = findTicketUrl(text);
+        return error;
+    }
+    // Reddit error bodies look like {"message", "error", "reason"?, "explanation"?}
+    let body = {};
+    try {
+        body = JSON.parse(text) ?? {};
+    } catch (e) {
+        // non-JSON body
+    }
+    const summary = body.message || res.statusText;
+    const detail = body.explanation || body.reason;
+    return new Error(
+        [res.status, summary, detail && `(${detail})`]
+            .filter(Boolean)
+            .join(" "),
+    );
 }
 
 export async function cachePosts(query, posts, exact) {

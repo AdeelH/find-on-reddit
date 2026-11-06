@@ -52,7 +52,3 @@ export async function getOptions(query) {
     const data = await chrome.storage.sync.get({ options: query });
     return data.options;
 }
-
-export function ignoreRejection(...args) {
-    return Promise.resolve();
-}

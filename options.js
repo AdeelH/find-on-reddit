@@ -45,6 +45,7 @@ async function saveOptions() {
         await updateOptions(options);
     } catch (e) {
         notifyFailure();
+        return;
     }
     notifySuccess();
     await restoreOptions();

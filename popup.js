@@ -5,7 +5,7 @@ import {
     navigateTo,
 } from "./chrome.js";
 import { processUrl, isYoutubeUrl, getYoutubeVideoId } from "./url.js";
-import { findOnReddit } from "./reddit.js";
+import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
 import { popupDefaults } from "./query.js";
 import { calcAge } from "./utils.js";
 
@@ -27,6 +27,14 @@ $(document).ready(init);
 
 function init() {
     DOM = fetchDomHandles();
+    if (SEARCH_DISABLED) {
+        DOM.urlInput.prop("disabled", true);
+        DOM.searchBtn.prop("disabled", true);
+        $("#url-container input[type=checkbox]").prop("disabled", true);
+        $("#url-container").addClass("search-disabled");
+        $("#unavailable-notice").removeClass("hidden");
+        return;
+    }
 
     getOptions(popupDefaults)
         .then((opts) => {
@@ -110,7 +118,11 @@ function registerHandlers(opts) {
     DOM.searchBtn.click(() => render(true));
 }
 
-function render(userClicked = false) {
+function render(userClicked = false, isRetry = false) {
+    clearTimeout(retryTimer);
+    if (!isRetry) {
+        retryAttempt = 0;
+    }
     setUiState("SEARCH_BEGIN");
     let urlPromise = getUrl();
     let params = getSearchParams();
@@ -155,24 +167,45 @@ function getUrl() {
     if (urlInput) {
         return Promise.resolve(urlInput);
     } else {
-        let urlPromise = getCurrentTabUrl(url);
+        let urlPromise = getCurrentTabUrl();
         urlPromise.then((url) => DOM.urlInput.val(url));
         return urlPromise;
     }
 }
 
-const AJAX_RETRY_DELAY_SEC = 5;
-let retry_countdown = AJAX_RETRY_DELAY_SEC;
+const MAX_RETRIES = 5;
+const RETRY_BASE_DELAY_SEC = 2;
+let retryAttempt = 0;
+let retryTimer = null;
 function onRequestError(error, userClicked = false) {
     console.log(error);
-    if (retry_countdown == 0) {
-        retry_countdown = AJAX_RETRY_DELAY_SEC;
-        render(userClicked);
+    if (error.retryable === false) {
+        setUiState("AJAX_ERROR_FATAL", {
+            msg: error.message,
+            helpUrl: error.helpUrl,
+        });
         return;
     }
-    retry_countdown -= 1;
-    setUiState("AJAX_ERROR", { msg: error.statusText, delay: retry_countdown });
-    setTimeout(() => onRequestError(error, userClicked), 1e3);
+    if (retryAttempt >= MAX_RETRIES) {
+        setUiState("AJAX_ERROR_FINAL", { msg: error.message });
+        return;
+    }
+    // exponential backoff: 2, 4, 8, 16, 32s
+    const delay = RETRY_BASE_DELAY_SEC * 2 ** retryAttempt;
+    retryAttempt += 1;
+    retryCountdown(delay, error.message, userClicked);
+}
+
+function retryCountdown(secondsLeft, msg, userClicked) {
+    if (secondsLeft <= 0) {
+        render(userClicked, true);
+        return;
+    }
+    setUiState("AJAX_ERROR", { msg: msg, delay: secondsLeft });
+    retryTimer = setTimeout(
+        () => retryCountdown(secondsLeft - 1, msg, userClicked),
+        1e3,
+    );
 }
 
 /* UI */
@@ -258,6 +291,25 @@ function setUiState(state, params = null) {
             DOM.statusDiv.text(
                 `${params.msg}, retrying in ${params.delay}s ...`,
             );
+            break;
+        }
+        case "AJAX_ERROR_FINAL": {
+            params.msg = params.msg || "error";
+            DOM.statusDiv.text(
+                `${params.msg}, giving up after ${MAX_RETRIES} retries. Click search to try again.`,
+            );
+            break;
+        }
+        case "AJAX_ERROR_FATAL": {
+            DOM.statusDiv.text(params.msg);
+            if (params.helpUrl) {
+                DOM.statusDiv.append(
+                    " ",
+                    $("<a>")
+                        .attr("href", params.helpUrl)
+                        .text("File a ticket with Reddit"),
+                );
+            }
             break;
         }
         case "YT_VID": {
