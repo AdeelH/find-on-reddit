@@ -1,33 +1,43 @@
 # Changelog
 
-## v1.6.3:
+## v1.6.4
+
+- Disable search due to Reddit API changes and add notice about unavailability.
+
+## v1.6.3
+
 - Handle /live/ YouTube URLS
 
-## v1.6.2:
+## v1.6.2
+
 - Slightly tweak how post ages are displayed:
-  - Use "days ago" for posts that are not older than 60 days.
-  - Round number of months to nearest 0.5. E.g. "1.5 months ago".
+    - Use "days ago" for posts that are not older than 60 days.
+    - Round number of months to nearest 0.5. E.g. "1.5 months ago".
 - Re-format code using the Prettier formatter.
 
-## v1.6.1:
+## v1.6.1
+
 - Make the options page dark themed, consistent with the popup (https://github.com/AdeelH/find-on-reddit/pull/51)
-  - Thanks nkmathew for the suggestion!
+    - Thanks nkmathew for the suggestion!
 - Add option for opening tab in background next to current tab instead of at the end (https://github.com/AdeelH/find-on-reddit/pull/52)
-  - Thanks nkmathew for the suggestion!
+    - Thanks nkmathew for the suggestion!
 - Fix problem w/ count of other kind of search not showing up plus general improvements (https://github.com/AdeelH/find-on-reddit/pull/53)
 - Add new option to do both exact and non-exact search with auto-search (https://github.com/AdeelH/find-on-reddit/pull/54)
 - Update dependencies (https://github.com/AdeelH/find-on-reddit/pull/56)
 
-## v1.5.8:
+## v1.5.8
+
 - Fix a bug causing links to not open in the same tab.
 
-## v1.5.6:
+## v1.5.6
+
 - Add option to show comment count instead of post count on extension icon when
   using auto-search.
 - Update to manifest v3.
 - Code improvements.
 
-## v1.5.5:
+## v1.5.5
+
 - Can now find even more results (in some cases) by using the /duplicates
   API endpoint. (Thanks Droyk for the suggestion!)
 - Can now find even more results (in some cases) by omitting the URL protocol
@@ -36,15 +46,18 @@
   (Thanks Droyk for the report!)
 - Minor bug fixes.
 
-## v1.5.4:
+## v1.5.4
+
 - Update Handlebars.js to 4.7.7 as per https://github.com/advisories/GHSA-f2jv-r9rf-7988.
 
-## v1.5.2:
+## v1.5.2
+
 - Fix bug in ctrl/cmd/shift/alt+click behavior. (Thanks NovaDev94 for the report!)
 - Minor improvements to the options page.
 
-## v1.5.0:
-- Updated Handlebars.js to latest version to 
+## v1.5.0
+
+- Updated Handlebars.js to latest version to
   include recently released security patch.
 - Fixed bug that caused the popup size/zoom to change on when a hyperlink was
   clicked (https://github.com/AdeelH/find-on-reddit/issues/17,
@@ -53,64 +66,73 @@
 - Improved ajax error handling.
 - Minor fixes and improvements.
 
-## v1.4.8:
+## v1.4.8
+
 - Added option to make all links point to old.reddit.com. Enabled by default.
 
-## v1.4.7:
+## v1.4.7
+
 - UI fixes and improvements
 
-## v1.4.5:
+## v1.4.5
+
 - added option to sort search results
-  - can sort on score, comments, age and 
-    subreddit
-  - default sorting preference can be set 
-    in the options
+    - can sort on score, comments, age and
+      subreddit
+    - default sorting preference can be set
+      in the options
 - minor improvements
 
-## v1.4.4:
+## v1.4.4
+
 - minor fixes and improvements
 
-## v1.4.3:
+## v1.4.3
+
 - bug fixes
 
-## v1.4.1:
+## v1.4.1
+
 - reduced extension size
-- added 'exact match' option to 
-  toggle between search and info 
+- added 'exact match' option to
+  toggle between search and info
   API endpoints
-- default options for search (exact matching, 
-  query-string, YT handling) can now be set 
+- default options for search (exact matching,
+  query-string, YT handling) can now be set
   on the options page
-- added option to allow automatic non-exact 
-  search if exact search returns 0 results 
+- added option to allow automatic non-exact
+  search if exact search returns 0 results
   (default: enabled)
-- added option to allow automatic retry in 
-  case of server/network error 
+- added option to allow automatic retry in
+  case of server/network error
   (default: enabled)
-- both exact and non-exact search results 
-  are now cached for each URL 
+- both exact and non-exact search results
+  are now cached for each URL
   simultaneously
 - UI improvement: toggling the checkboxes
   in the popup automatically initiates
-  the search without the user needing to 
+  the search without the user needing to
   press the search button
-- UI improvement: automatically uncheck 
+- UI improvement: automatically uncheck
   'ignore query string' if YT video detected
-- UI improvement: clear old badge on 
+- UI improvement: clear old badge on
   URL update
-- added option to post/repost link to Reddit 
+- added option to post/repost link to Reddit
   from the popup
 - other fixes and improvements
 
-## v1.3.2:
+## v1.3.2
+
 - fixed bug in caching implementation
 
-## v1.3.1:
+## v1.3.1
+
 - added auto-search feature
 - added options page
 - minor fixes and improvements
 
-## v1.2.1:
+## v1.2.1
+
 - ignore query-string by default
 - workaround for leading dashes in YT video
   IDs being interpreted as boolean NOT by
