@@ -5,7 +5,7 @@ import {
     navigateTo,
 } from "./chrome.js";
 import { processUrl, isYoutubeUrl, getYoutubeVideoId } from "./url.js";
-import { findOnReddit } from "./reddit.js";
+import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
 import { popupDefaults } from "./query.js";
 import { calcAge } from "./utils.js";
 
@@ -27,6 +27,11 @@ $(document).ready(init);
 
 function init() {
     DOM = fetchDomHandles();
+    if (SEARCH_DISABLED) {
+        $("#url-container").addClass("hidden");
+        $("#unavailable-notice").removeClass("hidden");
+        return;
+    }
 
     getOptions(popupDefaults)
         .then((opts) => {

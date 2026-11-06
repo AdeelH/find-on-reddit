@@ -1,11 +1,12 @@
 import { clearCache, getTabById, getOptions } from "./chrome.js";
 import { processUrl, removeQueryString, isYoutubeUrl } from "./url.js";
-import { findOnReddit } from "./reddit.js";
+import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
 import { bgOptions } from "./query.js";
 
 const BADGE_COLORS = {
     error: "#DD1616",
     success: "#555555",
+    notice: "#F0A500",
 };
 
 let bgOpts;
@@ -27,10 +28,23 @@ const USER_AGENT_RULE_ID = 1;
     // Avoid storage bloat. Ideally, this should happen on browser exit,
     // but the Chrome API doesn't provide an event for that.
     chrome.runtime.onStartup.addListener(clearCache);
+    if (SEARCH_DISABLED) {
+        showUnavailableBadge().catch(console.log);
+        return;
+    }
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
     setUserAgentRule().catch(console.log);
 })();
+
+// Global (not per-tab) so it shows on every tab without any tab events.
+async function showUnavailableBadge() {
+    await chrome.action.setBadgeText({ text: "!" });
+    await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLORS.notice });
+    await chrome.action.setTitle({
+        title: "Find on Reddit: search is currently unavailable. Click for details.",
+    });
+}
 
 // fetch() can't override User-Agent, so rewrite it on the extension's own requests to Reddit.
 // tabIds is only supported for session rules; those survive service worker restarts but not browser restarts.

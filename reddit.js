@@ -1,6 +1,9 @@
 import { getOptions, searchCache, cache } from "./chrome.js";
 import { DEFAULT_CACHE_PERIOD_MINS } from "./query.js";
 
+// Reddit now blocks unapproved API access; see https://github.com/AdeelH/find-on-reddit/issues/59
+export const SEARCH_DISABLED = true;
+
 export const SEARCH_API =
     "https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:";
 export const INFO_API = "https://www.reddit.com/api/info.json?url=";
