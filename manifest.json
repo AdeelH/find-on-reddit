@@ -15,8 +15,7 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "storage",
-    "declarativeNetRequestWithHostAccess"
+    "storage"
   ],
   "host_permissions": [
     "http://*/*",
