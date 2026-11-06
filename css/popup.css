@@ -24,6 +24,11 @@ body
   color: #F0A500;
 }
 
+.search-disabled
+{
+  opacity: 0.5;
+}
+
 .num-results-container
 {
   padding-left: 5px;

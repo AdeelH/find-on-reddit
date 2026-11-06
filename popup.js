@@ -28,7 +28,10 @@ $(document).ready(init);
 function init() {
     DOM = fetchDomHandles();
     if (SEARCH_DISABLED) {
-        $("#url-container").addClass("hidden");
+        DOM.urlInput.prop("disabled", true);
+        DOM.searchBtn.prop("disabled", true);
+        $("#url-container input[type=checkbox]").prop("disabled", true);
+        $("#url-container").addClass("search-disabled");
         $("#unavailable-notice").removeClass("hidden");
         return;
     }
