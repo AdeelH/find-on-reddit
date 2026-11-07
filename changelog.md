@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.5
+
+- Re-enable search using a workaround that requires being logged in to Reddit in the browser.
+- "Exact match" is now determined by filtering search results, since Reddit's exact-match endpoint is blocked.
+- Show a notice if Reddit blocks the search, and a warning that the extension may stop working in the future.
+- Auto-search is now off by default (existing saved settings are unchanged).
+
 ## v1.6.4
 
 - Disable search due to Reddit API changes and add notice about unavailability.
