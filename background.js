@@ -1,6 +1,6 @@
 import { clearCache, getTabById, getOptions } from "./chrome.js";
 import { processUrl, removeQueryString, isYoutubeUrl } from "./url.js";
-import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
+import { findOnReddit } from "./reddit.js";
 import { bgOptions } from "./query.js";
 
 const BADGE_COLORS = {
@@ -20,61 +20,15 @@ let tabActivatedListenerActive = false;
 // as the tab goes through different states while loading.
 let recentlyQueried = new Set([]);
 
-const USER_AGENT_RULE_ID = 1;
-
 // Runs on every service worker start, which happens frequently in v3.
 // this CANNOT be async because "Top-level await is disallowed in service workers."
 (function init() {
     // Avoid storage bloat. Ideally, this should happen on browser exit,
     // but the Chrome API doesn't provide an event for that.
     chrome.runtime.onStartup.addListener(clearCache);
-    if (SEARCH_DISABLED) {
-        showUnavailableBadge().catch(console.log);
-        return;
-    }
     chrome.tabs.onUpdated.addListener(tabUpdatedListener);
     chrome.tabs.onActivated.addListener(tabActivatedListener);
-    setUserAgentRule().catch(console.log);
 })();
-
-// Global (not per-tab) so it shows on every tab without any tab events.
-async function showUnavailableBadge() {
-    await chrome.action.setBadgeText({ text: "!" });
-    await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLORS.notice });
-    await chrome.action.setTitle({
-        title: "Find on Reddit: search is currently unavailable. Click for details.",
-    });
-}
-
-// fetch() can't override User-Agent, so rewrite it on the extension's own requests to Reddit.
-// tabIds is only supported for session rules; those survive service worker restarts but not browser restarts.
-async function setUserAgentRule() {
-    const version = chrome.runtime.getManifest().version;
-    await chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [USER_AGENT_RULE_ID],
-        addRules: [
-            {
-                id: USER_AGENT_RULE_ID,
-                priority: 1,
-                action: {
-                    type: "modifyHeaders",
-                    requestHeaders: [
-                        {
-                            header: "User-Agent",
-                            operation: "set",
-                            value: `chrome-extension:find-on-reddit:${version}`,
-                        },
-                    ],
-                },
-                condition: {
-                    requestDomains: ["reddit.com"],
-                    tabIds: [chrome.tabs.TAB_ID_NONE],
-                    resourceTypes: ["xmlhttprequest"],
-                },
-            },
-        ],
-    });
-}
 
 async function updateListenerFlags() {
     const opts = await getOptions(bgOptions);
@@ -185,6 +139,9 @@ function isBlackListed(url) {
 
 async function handleError(e, tabId) {
     console.log(e);
+    if (e.blocked) {
+        return setBadge(tabId, "!", BADGE_COLORS.notice);
+    }
     return setErrorBadge(tabId);
 }
 

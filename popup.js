@@ -5,7 +5,7 @@ import {
     navigateTo,
 } from "./chrome.js";
 import { processUrl, isYoutubeUrl, getYoutubeVideoId } from "./url.js";
-import { findOnReddit, SEARCH_DISABLED } from "./reddit.js";
+import { findOnReddit } from "./reddit.js";
 import { popupDefaults } from "./query.js";
 import { calcAge } from "./utils.js";
 
@@ -27,14 +27,6 @@ $(document).ready(init);
 
 function init() {
     DOM = fetchDomHandles();
-    if (SEARCH_DISABLED) {
-        DOM.urlInput.prop("disabled", true);
-        DOM.searchBtn.prop("disabled", true);
-        $("#url-container input[type=checkbox]").prop("disabled", true);
-        $("#url-container").addClass("search-disabled");
-        $("#unavailable-notice").removeClass("hidden");
-        return;
-    }
 
     getOptions(popupDefaults)
         .then((opts) => {
@@ -179,11 +171,8 @@ let retryAttempt = 0;
 let retryTimer = null;
 function onRequestError(error, userClicked = false) {
     console.log(error);
-    if (error.retryable === false) {
-        setUiState("AJAX_ERROR_FATAL", {
-            msg: error.message,
-            helpUrl: error.helpUrl,
-        });
+    if (error.blocked) {
+        setUiState("BLOCKED");
         return;
     }
     if (retryAttempt >= MAX_RETRIES) {
@@ -274,6 +263,7 @@ function setUiState(state, params = null) {
     switch (state) {
         case "SEARCH_BEGIN": {
             DOM.statusDiv.text("Searching ...");
+            DOM.unavailableNotice.addClass("hidden");
             break;
         }
         case "SEARCH_END": {
@@ -300,16 +290,10 @@ function setUiState(state, params = null) {
             );
             break;
         }
-        case "AJAX_ERROR_FATAL": {
-            DOM.statusDiv.text(params.msg);
-            if (params.helpUrl) {
-                DOM.statusDiv.append(
-                    " ",
-                    $("<a>")
-                        .attr("href", params.helpUrl)
-                        .text("File a ticket with Reddit"),
-                );
-            }
+        case "BLOCKED": {
+            DOM.statusDiv.text("");
+            DOM.resultsDiv.empty();
+            DOM.unavailableNotice.removeClass("hidden");
             break;
         }
         case "YT_VID": {
@@ -354,6 +338,7 @@ function fetchDomHandles() {
         otherResultsDiv: $("#other-results"),
         otherResultsNum: $("#other-results-num"),
         statusDiv: $("#status"),
+        unavailableNotice: $("#unavailable-notice"),
         urlInput: $("#url"),
         searchBtn: $("#url-submit"),
         ytChoice: $("#yt-choice"),
