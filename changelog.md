@@ -6,6 +6,7 @@
 - "Exact match" is now determined by filtering search results, since Reddit's exact-match endpoint is blocked.
 - Show a notice if Reddit blocks the search, and a warning that the extension may stop working in the future.
 - Auto-search is now off by default (existing saved settings are unchanged).
+- Show a note if the extension is used in incognito mode, explaining that searches still use the Reddit login from the regular browser window.
 
 ## v1.6.4
 

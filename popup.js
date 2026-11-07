@@ -1,5 +1,6 @@
 import {
     getOptions,
+    getCurrentTab,
     getCurrentTabUrl,
     getCurrentTabIndex,
     navigateTo,
@@ -27,6 +28,7 @@ $(document).ready(init);
 
 function init() {
     DOM = fetchDomHandles();
+    showIncognitoNote().catch(console.log);
 
     getOptions(popupDefaults)
         .then((opts) => {
@@ -37,6 +39,14 @@ function init() {
         })
         .then(render)
         .catch(console.log);
+}
+
+// The extension shares the regular profile's cookies, so incognito lookups aren't anonymous.
+async function showIncognitoNote() {
+    const tab = await getCurrentTab();
+    if (tab && tab.incognito) {
+        $("#incognito-note").removeClass("hidden");
+    }
 }
 
 function registerHandlers(opts) {
