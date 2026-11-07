@@ -62,6 +62,9 @@ function registerHandlers(opts) {
         if (e.metaKey || e.shiftKey || e.altKey) {
             /* cmd/shift/alt + click: 
 			do not modify default browser behavior */
+        } else if ($(this).hasClass("open-in-bg")) {
+            chrome.tabs.create({ url: clickedUrl, active: false });
+            return false;
         } else if (e.ctrlKey) {
             /* Default open-in-new-tab behavior seems to have changed
 			such that the popup gets closed after the click. This overwrites
