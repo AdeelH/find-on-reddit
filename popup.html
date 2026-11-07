@@ -19,6 +19,15 @@
 
 <body class="night-mode">
 	<div id="main" class="container-fluid">
+		<div class="row api-warning">
+			<span class="glyphicon glyphicon-info-sign"></span>
+			Reddit is restricting access to its API, so Find on Reddit may stop working in the near future.
+			<a class="open-in-bg" href="https://github.com/AdeelH/find-on-reddit/issues/59" target="_blank" rel="noopener">Details</a>
+		</div>
+		<div id="incognito-note" class="row api-warning hidden">
+			<span class="glyphicon glyphicon-eye-close"></span>
+			In incognito, searches still use the Reddit login (cookies) from your regular browser window.
+		</div>
 		<div id="url-container" class="row">
 			<form class="form">
 				<div class="form-group">
@@ -63,21 +72,18 @@
 		</div>
 		<div id="status" class="row search-status"></div>
 		<div id="unavailable-notice" class="row notice hidden">
-			<h4>Search is currently unavailable</h4>
+			<h4>Reddit blocked this search</h4>
 			<p>
-				Reddit has started blocking access to its API and is foisting a byzantine approval
-				process on developers who wish to continue using it. As a result, users of Find on
-				Reddit, including me, have been seeing search consistently fail with errors for the past
-				several days or weeks. The error itself is an opaque and unhelpful 403.
+				Reddit now blocks most API access from apps like Find on Reddit. For now, search only
+				works if you are logged in to Reddit in this browser.
 			</p>
 			<p>
-				I'm trying to navigate this nonsense and get the search working again.
-				If that succeeds, it will come back in a future update, but I can't make any promises.
-				Thank you for using Find on Reddit.
+				If you aren't logged in, log in to reddit.com and try again. If you are logged in and
+				still see this, Reddit has likely closed this workaround too.
 			</p>
 			<p>
 				For updates or suggestions, see
-				<a href="https://github.com/AdeelH/find-on-reddit/issues/59" target="_blank" rel="noopener">this GitHub issue</a>.
+				<a class="open-in-bg" href="https://github.com/AdeelH/find-on-reddit/issues/59" target="_blank" rel="noopener">this GitHub issue</a>.
 			</p>
 		</div>
 		<div id="results" class="row"></div>

@@ -24,9 +24,11 @@ body
   color: #F0A500;
 }
 
-.search-disabled
+.api-warning
 {
-  opacity: 0.5;
+  padding: 0 0 10px 0;
+  font-size: 12px;
+  color: #F0A500;
 }
 
 .num-results-container

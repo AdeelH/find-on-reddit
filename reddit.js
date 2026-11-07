@@ -1,53 +1,56 @@
 import { getOptions, searchCache, cache } from "./chrome.js";
 import { DEFAULT_CACHE_PERIOD_MINS } from "./query.js";
 
-// Reddit now blocks unapproved API access; see https://github.com/AdeelH/find-on-reddit/issues/59
-export const SEARCH_DISABLED = true;
-
+// The logged-out .json API and /api/info are blocked; api.reddit.com/search still
+// works with the user's own Reddit session. See https://github.com/AdeelH/find-on-reddit/issues/59
 export const SEARCH_API =
-    "https://api.reddit.com/search.json?sort=top&t=all&limit=100&q=url:";
-export const INFO_API = "https://www.reddit.com/api/info.json?url=";
+    "https://api.reddit.com/search?sort=top&t=all&limit=100&q=url:";
 export const DUPLICATES_API = "https://api.reddit.com/duplicates/";
 
 export async function findOnReddit(url, useCache = true, exact = true) {
-    const url_no_protocol = url.replace(/^https?\:\/\//i, "");
     const query = encodeURIComponent(url);
-    const queryNoProtocol = encodeURIComponent(url_no_protocol);
-    const searchResults = exact
-        ? await search(query, useCache, true)
-        : await search(queryNoProtocol, useCache, false);
-    if (!searchResults.fromCache) {
-        const posts = searchResults.posts;
-        try {
-            await cachePosts(query, posts, (exact = exact));
-            await cachePosts(queryNoProtocol, posts, (exact = exact));
-        } catch (e) {
-            console.log(e);
-        }
-    }
-    return searchResults;
-}
-
-export async function search(query, useCache = true, exact = true) {
-    const requestUrl = `${exact ? INFO_API : SEARCH_API}${query}`;
-    const cache = await searchCache(query);
-    const data = cache[query] || {};
-    const key = exact ? "exact" : "nonExact";
-    const otherResults = data[exact ? "nonExact" : "exact"];
-    const isValid = await checkCacheValidity(data, key);
-    if (useCache && isValid) {
+    const [key, otherKey] = exact
+        ? ["exact", "nonExact"]
+        : ["nonExact", "exact"];
+    const data = (await searchCache(query))[query] || {};
+    if (useCache && (await checkCacheValidity(data, key))) {
         return {
             posts: data[key].posts,
             fromCache: true,
-            other: otherResults != null ? otherResults.posts.length : undefined,
+            other: data[otherKey]?.posts.length,
         };
     }
-    const posts = await getPostsViaApi(requestUrl);
+    const results = await searchApi(url);
+    try {
+        await cachePosts(query, results.exact, true);
+        await cachePosts(query, results.nonExact, false);
+    } catch (e) {
+        console.log(e);
+    }
     return {
-        posts: posts,
+        posts: results[key],
         fromCache: false,
-        other: otherResults != null ? otherResults.posts.length : undefined,
+        other: results[otherKey].length,
     };
+}
+
+// One search request serves both modes: exact matches are filtered out of its results.
+async function searchApi(url) {
+    const query = encodeURIComponent(stripProtocol(url));
+    const nonExact = await getPostsViaApi(`${SEARCH_API}${query}`);
+    const target = normalizeUrl(url);
+    const exact = nonExact.filter(
+        (p) => normalizeUrl(p.data.url || "") === target,
+    );
+    return { exact, nonExact };
+}
+
+function stripProtocol(url) {
+    return url.replace(/^https?:\/\//i, "");
+}
+
+function normalizeUrl(url) {
+    return stripProtocol(url).replace(/\/$/, "");
 }
 
 export async function getPostsViaApi(requestUrl) {
@@ -83,47 +86,20 @@ export async function get_duplicates_for_id(post_id) {
 }
 
 export async function makeApiRequest(url) {
-    // Public endpoints; don't attach the user's Reddit session to automated lookups.
-    const res = await fetch(url, { credentials: "omit" });
+    // Requests are only accepted with the user's own Reddit session.
+    const res = await fetch(url, { credentials: "include" });
     if (!res.ok) {
         throw await buildResponseError(res);
     }
     return res.json();
 }
 
-const REDDIT_TICKET_URL =
-    "https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=21879292693140";
-
-function findTicketUrl(html) {
-    // DOMParser is unavailable in the service worker; it never runs scripts or loads resources.
-    if (typeof DOMParser === "undefined") {
-        return REDDIT_TICKET_URL;
-    }
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    for (const a of doc.querySelectorAll("a[href]")) {
-        try {
-            const url = new URL(a.getAttribute("href"));
-            if (
-                url.protocol === "https:" &&
-                url.hostname === "support.reddithelp.com"
-            ) {
-                return url.href;
-            }
-        } catch (e) {
-            // not an absolute URL
-        }
-    }
-    return REDDIT_TICKET_URL;
-}
-
 async function buildResponseError(res) {
     const text = await res.text().catch(() => "");
-    if (/blocked by network security/i.test(text)) {
-        const error = new Error(
-            "Blocked by Reddit's network security. This can happen on a VPN or proxy.",
-        );
+    if (res.status === 403 || /blocked by network security/i.test(text)) {
+        const error = new Error(`${res.status} Blocked by Reddit`);
+        error.blocked = true;
         error.retryable = false;
-        error.helpUrl = findTicketUrl(text);
         return error;
     }
     // Reddit error bodies look like {"message", "error", "reason"?, "explanation"?}

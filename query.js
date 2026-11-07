@@ -26,8 +26,8 @@ export const popupDefaults = {
 export const autorun = {
     retryExact: true,
     alwaysBothExactAndNonExact: false,
-    updated: true,
-    activated: true,
+    updated: false,
+    activated: false,
     retryError: true,
     badgeContent: "num_posts",
 };
